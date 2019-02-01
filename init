@@ -1,0 +1,35 @@
+# this file should be executed and it's results sourced.
+# such as: source <(cookbook/init sc ~/script_root)
+# init will print the wrapper functions needed to bootstrap
+# the sc function.
+# 
+# Bootstrapping the sc section requires two parts:
+# 1. creating the function in question
+# 2. wiring up tab completion for the function.
+#
+# functions must be used instead of a script, as
+# cookbook also supports commands that modify the
+# current environment (such as cd you into a specific)
+# directory.
+COOKBOOK_DIR=`dirname $0`
+FUNCTION_NAME=$1
+SCRIPT_ROOT=$2
+if [[ "$SHELL" =~ "bash" ]]; then
+    # completion is accomplished by thre parts:
+    # 1. passing all possible completions to execute.py
+    # 2. filtering for valid options using compgen
+    # 3. appending to the valid option environment variable.
+    echo "
+function ${FUNCTION_NAME} {
+    \`$COOKBOOK_DIR/execute.py $SCRIPT_ROOT \$@\`
+}
+
+function _${FUNCTION_NAME}_completions {
+    all_options=\`$COOKBOOK_DIR/execute.py $SCRIPT_ROOT \$@ --complete\`
+    valid_options=\$(compgen -W \"\$all_options\" \"\${COMP_WORDS[1]}\")
+    COMPREPLY=(\$valid_options)
+}
+
+complete -F _${FUNCTION_NAME}_completions ${FUNCTION_NAME}
+"
+fi
