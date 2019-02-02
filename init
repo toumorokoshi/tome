@@ -21,11 +21,11 @@ if [[ "$SHELL" =~ "bash" ]]; then
     # 3. appending to the valid option environment variable.
     echo "
 function ${FUNCTION_NAME} {
-    \`$COOKBOOK_DIR/execute.py $SCRIPT_ROOT \$@\`
+    \`$COOKBOOK_DIR/target/release/cookbook $SCRIPT_ROOT \$@\`
 }
 
 function _${FUNCTION_NAME}_completions {
-    all_options=\`$COOKBOOK_DIR/execute.py $SCRIPT_ROOT \$@ --complete\`
+    all_options=\`$COOKBOOK_DIR/target/release/cookbook $SCRIPT_ROOT \$@ --complete\`
     valid_options=\$(compgen -W \"\$all_options\" \"\${COMP_WORDS[1]}\")
     COMPREPLY=(\$valid_options)
 }
