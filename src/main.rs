@@ -1,5 +1,6 @@
 use std::{env::args, fs, path::PathBuf};
 
+mod commands;
 #[cfg(test)]
 mod tests;
 

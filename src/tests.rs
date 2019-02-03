@@ -25,3 +25,13 @@ fn test_directory_completion() {
         Ok("bar foo".to_string())
     );
 }
+
+/// if completion is requested on a directory,
+/// return the list of file and directories in there.
+#[test]
+fn test_script_in_directory() {
+    assert_eq!(
+        execute(_vec_str(vec![EXAMPLE_DIR, "dir_example", "foo"])),
+        Ok(format!("{}/dir_example/foo", EXAMPLE_DIR))
+    );
+}
