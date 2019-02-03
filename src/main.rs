@@ -1,5 +1,17 @@
 use std::{env::args, fs, path::PathBuf};
 
+#[cfg(test)]
+mod tests;
+
+pub fn main() {
+    let args: Vec<String> = args().peekable().collect();
+    let result = match execute(args) {
+        Ok(result) => result,
+        Err(error_message) => error_message,
+    };
+    print!("echo {}", result);
+}
+
 enum CommandType {
     Execute,
     Completion,
@@ -10,11 +22,11 @@ enum TargetType {
     Directory,
 }
 
-fn main() {
-    let mut args = args().peekable();
+pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
+    let mut args = raw_args.iter().peekable();
     let mut target = PathBuf::from(&match args.next() {
         Some(arg) => arg,
-        None => panic!("at least one argument expected"),
+        None => return Err(String::from("at least one argument expected")),
     });
     // next, we determine if we have a file or a directory,
     // recursing down arguments until we've exhausted arguments
@@ -62,10 +74,12 @@ fn main() {
                 }
                 result.join(" ").to_owned()
             }
-            CommandType::Execute => format!(
-                "echo {} is a directory tab-complete to choose subcommands",
-                target.to_str().unwrap_or("")
-            ),
+            CommandType::Execute => {
+                return Err(format!(
+                    "echo {} is a directory tab-complete to choose subcommands",
+                    target.to_str().unwrap_or("")
+                ))
+            }
         },
         TargetType::File => {
             let mut command = vec![target.to_str().unwrap_or("")];
@@ -75,5 +89,5 @@ fn main() {
             command.join(" ").to_owned()
         }
     };
-    print!("{}", &output);
+    return Ok(output);
 }
