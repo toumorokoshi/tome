@@ -1,1 +1,4 @@
 site_name: My Docs
+# pip install mkdocs-material
+theme:
+  name: material
