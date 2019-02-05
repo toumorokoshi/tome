@@ -1,2 +1,10 @@
 #!/usr/bin/env python
 # DESCRIPTION: this is an example of a simple script written in python.
+import sys
+# when attempting to complete a variable,
+# --complete will be passed, with the full argument set.
+# for example, 
+# $ cb file_example foo a --complete
+# will pass all arguments (the "a" should be autocompleted.)
+if sys.argv[-1] == "--complete":
+    print("file autocomplete example")

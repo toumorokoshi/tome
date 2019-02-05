@@ -16,6 +16,14 @@ fn test_simple_script() {
     );
 }
 
+#[test]
+fn test_simple_script_completion() {
+    assert_eq!(
+        execute(_vec_str(vec![EXAMPLE_DIR, "foobar", "--complete"])),
+        Ok(String::from("file autocomplete example"))
+    );
+}
+
 /// if completion is requested on a directory,
 /// return the list of file and directories in there.
 #[test]

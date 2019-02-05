@@ -1,4 +1,9 @@
-use std::{env::args, fs, path::PathBuf};
+use std::{
+    env::args,
+    fs,
+    path::PathBuf,
+    process::{Command, Stdio},
+};
 
 mod commands;
 #[cfg(test)]
@@ -82,13 +87,35 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
                 ))
             }
         },
-        TargetType::File => {
-            let mut command = vec![target.to_str().unwrap_or("")];
-            for arg in remaining_args.iter() {
-                command.push(&arg);
+        TargetType::File => match command_type {
+            CommandType::Completion => {
+                // There's a possible optimization here
+                // if we just inherit parent file descriptors.
+                let command_output = Command::new(target.to_str().unwrap_or(""))
+                    .args(&remaining_args)
+                    .stdout(Stdio::piped())
+                    .output();
+                match command_output {
+                    Ok(output) => match String::from_utf8(output.stdout) {
+                        Err(error) => format!(
+                            "unable to parse completion results as a utf8 string: {}",
+                            error
+                        ),
+                        Ok(result) => result,
+                    },
+                    // TODO: it's hard to get output from a completion call.
+                    // possible to print to stderr?
+                    Err(result) => format!("completion called failed: {}", result),
+                }
             }
-            command.join(" ").to_owned()
-        }
+            CommandType::Execute => {
+                let mut command = vec![target.to_str().unwrap_or("")];
+                for arg in remaining_args.iter() {
+                    command.push(&arg);
+                }
+                command.join(" ").to_owned()
+            }
+        },
     };
     return Ok(output);
 }
