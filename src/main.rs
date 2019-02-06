@@ -1,5 +1,5 @@
 use std::{
-    env::args,
+    env::{args, var},
     fs,
     path::PathBuf,
     process::{Command, Stdio},
@@ -91,9 +91,11 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
             CommandType::Completion => {
                 // There's a possible optimization here
                 // if we just inherit parent file descriptors.
-                let command_output = Command::new(target.to_str().unwrap_or(""))
-                    .args(&remaining_args)
-                    .stdout(Stdio::piped())
+                remaining_args.insert(0, &String::from(target.to_str().unwrap_or_default()));
+                let command_output = Command::new(var("SHELL").unwrap_or_default())
+                    .arg("-c")
+                    .arg(remaining_args.join(" "))
+                    .stdout(Stdio::inherit())
                     .output();
                 match command_output {
                     Ok(output) => match String::from_utf8(output.stdout) {

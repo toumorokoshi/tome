@@ -11,8 +11,8 @@ fn _vec_str(args: Vec<&str>) -> Vec<String> {
 #[test]
 fn test_simple_script() {
     assert_eq!(
-        execute(_vec_str(vec![EXAMPLE_DIR, "foobar"])),
-        Ok(format!("{}/foobar", EXAMPLE_DIR))
+        execute(_vec_str(vec![EXAMPLE_DIR, "file_example"])),
+        Ok(format!("{}/file_example", EXAMPLE_DIR))
     );
 }
 

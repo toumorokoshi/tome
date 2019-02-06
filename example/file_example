@@ -8,3 +8,5 @@ import sys
 # will pass all arguments (the "a" should be autocompleted.)
 if sys.argv[-1] == "--complete":
     print("file autocomplete example")
+    print(" ".join(sys.argv))
+print("file autocomplete example")
