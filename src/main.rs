@@ -1,5 +1,5 @@
 use std::{
-    env::{args, var},
+    env::args,
     fs,
     path::PathBuf,
     process::{Command, Stdio},
@@ -91,11 +91,9 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
             CommandType::Completion => {
                 // There's a possible optimization here
                 // if we just inherit parent file descriptors.
-                remaining_args.insert(0, &String::from(target.to_str().unwrap_or_default()));
-                let command_output = Command::new(var("SHELL").unwrap_or_default())
-                    .arg("-c")
-                    .arg(remaining_args.join(" "))
-                    .stdout(Stdio::inherit())
+                let command_output = Command::new(target.to_str().unwrap_or_default())
+                    .args(&remaining_args)
+                    .stdout(Stdio::piped())
                     .output();
                 match command_output {
                     Ok(output) => match String::from_utf8(output.stdout) {
@@ -103,7 +101,10 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
                             "unable to parse completion results as a utf8 string: {}",
                             error
                         ),
-                        Ok(result) => result,
+                        Ok(result) => {
+                            println!("{}", result);
+                            result
+                        }
                     },
                     // TODO: it's hard to get output from a completion call.
                     // possible to print to stderr?

@@ -19,7 +19,7 @@ fn test_simple_script() {
 #[test]
 fn test_simple_script_completion() {
     assert_eq!(
-        execute(_vec_str(vec![EXAMPLE_DIR, "foobar", "--complete"])),
+        execute(_vec_str(vec![EXAMPLE_DIR, "file_example", "--complete"])),
         Ok(String::from("file autocomplete example"))
     );
 }
