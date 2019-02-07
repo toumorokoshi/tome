@@ -25,8 +25,17 @@ function ${FUNCTION_NAME} {
 }
 
 function _${FUNCTION_NAME}_completions {
-    all_options=\`$COOKBOOK_DIR/target/release/cookbook $SCRIPT_ROOT \$@ --complete\`
-    valid_options=\$(compgen -W \"\$all_options\" \"\${COMP_WORDS[1]}\")
+    # we remove the first argument, which states the function name.
+    shift
+    # next reverse the order of the arguments. for some
+    # reason completion returns arguments in reverse order.
+    local args i;
+    for i; do
+        args=\"\$i \$args\"
+    done 
+    cmd=\"$COOKBOOK_DIR/target/release/cookbook $SCRIPT_ROOT \$args --complete\"
+    all_options=\`$COOKBOOK_DIR/target/release/cookbook $SCRIPT_ROOT \$args --complete\`
+    valid_options=\$(compgen -W \"\$all_options\" \"\${COMP_WORDS[COMP_CWORD]}\")
     COMPREPLY=(\$valid_options)
 }
 
