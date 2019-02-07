@@ -6,11 +6,10 @@ mod tests;
 
 pub fn main() {
     let args: Vec<String> = args().peekable().collect();
-    let result = match execute(args) {
-        Ok(result) => result,
-        Err(error_message) => error_message,
+    match execute(args) {
+        Ok(result) => print!("{}", result),
+        Err(error_message) => print!("echo {}", error_message),
     };
-    print!("echo {}", result);
 }
 
 pub enum CommandType {
@@ -77,7 +76,7 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
             }
             CommandType::Execute => {
                 return Err(format!(
-                    "echo {} is a directory tab-complete to choose subcommands",
+                    "echo {} is a directory. tab-complete to choose subcommands",
                     target.to_str().unwrap_or("")
                 ))
             }

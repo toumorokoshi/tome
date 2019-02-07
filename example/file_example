@@ -10,3 +10,5 @@ import sys
 # will pass all arguments (the "a" should be autocompleted.)
 if sys.argv[-1] == "--complete":
     sys.stdout.write("file autocomplete example")
+else:
+    print("hello")

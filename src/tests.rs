@@ -29,7 +29,7 @@ fn test_simple_script_completion() {
 fn test_source() {
     assert_eq!(
         execute(_vec_str(vec![EXAMPLE_DIR, "source_example"])),
-        Ok(String::from("if [ \"$1\" == \"--complete\" ]; then\nif [ \"$1\" == \"--complete\" ]; then\n    echo \"foo baz\"\nif [ \"$1\" == \"--complete\" ]; then\n    echo \"foo baz\"\n    exit\nif [ \"$1\" == \"--complete\" ]; then\n    echo \"foo baz\"\n    exit\nfi\nif [ \"$1\" == \"--complete\" ]; then\n    echo \"foo baz\"\n    exit\nfi\ncd /tmp"))
+        Ok(format!("source {}/source_example", EXAMPLE_DIR))
     );
 }
 

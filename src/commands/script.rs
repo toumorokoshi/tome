@@ -126,7 +126,11 @@ impl Script {
             CommandType::Execute => {
                 if self.should_source {
                     // when sourcing, just return the full body.
-                    Ok(self.body.clone())
+                    let mut command = vec![String::from("source"), self.path.clone()];
+                    for arg in args.iter() {
+                        command.push((**arg).clone());
+                    }
+                    Ok(command.join(" ").to_owned())
                 } else {
                     // the command should be run directly by the outer shell, so
                     // output that.
