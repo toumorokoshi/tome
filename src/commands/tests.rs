@@ -44,5 +44,5 @@ fn test_help() {
     ",
         )) as Box<Read>,
     );
-    assert_eq!(&script.help_string, "foo bar baz");
+    assert_eq!(&script.help_string, "foo bar baz\n");
 }

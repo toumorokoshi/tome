@@ -24,6 +24,27 @@ fn test_simple_script_completion() {
     );
 }
 
+/// basic test for a script that should be sourced
+#[test]
+fn test_source() {
+    assert_eq!(
+        execute(_vec_str(vec![EXAMPLE_DIR, "source_example"])),
+        Ok(String::from("if [ \"$1\" == \"--complete\" ]; then\nif [ \"$1\" == \"--complete\" ]; then\n    echo \"foo baz\"\nif [ \"$1\" == \"--complete\" ]; then\n    echo \"foo baz\"\n    exit\nif [ \"$1\" == \"--complete\" ]; then\n    echo \"foo baz\"\n    exit\nfi\nif [ \"$1\" == \"--complete\" ]; then\n    echo \"foo baz\"\n    exit\nfi\ncd /tmp"))
+    );
+}
+
+#[test]
+fn test_source_completion() {
+    assert_eq!(
+        execute(_vec_str(vec![EXAMPLE_DIR, "source_example", "--complete"])),
+        Ok(String::from("foo baz\n"))
+    );
+}
+
+/// if completion is requested on a directory,
+
+/// if completion is requested on a directory,
+
 /// if completion is requested on a directory,
 /// return the list of file and directories in there.
 #[test]

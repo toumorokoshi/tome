@@ -1,12 +1,14 @@
+use super::super::CommandType;
 use std::{
+    env::var,
     fs::File,
     io,
-    io::{prelude::*, BufReader, Read, Seek},
-    path::Path,
+    io::{prelude::*, BufReader, Read},
+    process::{Command, Stdio},
 };
 /// Any executable script
 /// can be added to be executed, but
-/// it's possible to add metadata
+/// t's possible to add metadata
 /// to the script via comments as well.
 pub struct Script {
     /// the path the script is located at.
@@ -17,6 +19,9 @@ pub struct Script {
     /// the string that should be printed
     /// when help is requested.
     pub help_string: String,
+    /// if the file should be sourced,
+    /// load the full body.
+    pub body: String,
 }
 
 impl Script {
@@ -30,7 +35,9 @@ impl Script {
         let mut help_string = String::new();
         let mut line = String::new();
         let mut consuming_help = false;
+        let mut body = String::new();
         loop {
+            line.clear();
             match buffer.read_line(&mut line) {
                 Ok(bytes_read) => {
                     if bytes_read == 0 {
@@ -56,14 +63,80 @@ impl Script {
                     // if a shebang is encountered, we skip.
                     // as it can indicate the command to run the script with.
                     // metadata lines must be consecutive.
+                    body.push_str(&line);
                     break;
                 }
+            }
+        }
+        // we should source, we read the rest of the body
+        if should_source {
+            loop {
+                match buffer.read_line(&mut line) {
+                    Ok(bytes_read) => {
+                        if bytes_read == 0 {
+                            break;
+                        }
+                    }
+                    Err(_) => break,
+                }
+                body.push_str(&line);
             }
         }
         Script {
             path,
             should_source,
             help_string,
+            body,
+        }
+    }
+
+    // return the appropriate string that should be exeucted within the
+    // function.
+    pub fn get_execution_body(
+        &self,
+        command_type: CommandType,
+        args: &Vec<&String>,
+    ) -> Result<String, String> {
+        match command_type {
+            CommandType::Completion => {
+                // in the completion case, we need to execute the script itself.
+                // There's a possible optimization here
+                // if we just inherit parent file descriptors.
+                let mut command = match self.should_source {
+                    true => Command::new(var("SHELL").unwrap_or_default()),
+                    false => Command::new(self.path.clone()),
+                };
+                if self.should_source {
+                    command.arg(self.path.clone());
+                }
+                let command_output = command.args(args).stdout(Stdio::piped()).output();
+                match command_output {
+                    Ok(output) => match String::from_utf8(output.stdout) {
+                        Err(error) => Err(format!(
+                            "unable to parse completion results as a utf8 string: {}",
+                            error
+                        )),
+                        Ok(result) => Ok(result),
+                    },
+                    // TODO: it's hard to get output from a completion call.
+                    // possible to print to stderr?
+                    Err(result) => Err(format!("completion called failed: {}", result)),
+                }
+            }
+            CommandType::Execute => {
+                if self.should_source {
+                    // when sourcing, just return the full body.
+                    Ok(self.body.clone())
+                } else {
+                    // the command should be run directly by the outer shell, so
+                    // output that.
+                    let mut command = vec![self.path.clone()];
+                    for arg in args.iter() {
+                        command.push((**arg).clone());
+                    }
+                    Ok(command.join(" ").to_owned())
+                }
+            }
         }
     }
 }

@@ -1,0 +1,6 @@
+# SOURCE
+if [ "$1" == "--complete" ]; then
+    echo "foo baz"
+    exit
+fi
+cd /tmp
