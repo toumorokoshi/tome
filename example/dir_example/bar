@@ -1,2 +1,5 @@
 #!/usr/bin/env bash
+if [[ "${@:-1}" == "--complete" ]]; then
+    exit
+fi
 echo "bar"

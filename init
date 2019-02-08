@@ -1,5 +1,5 @@
 # this file should be executed and it's results sourced.
-# such as: source <(cookbook/init sc ~/script_root)
+# such as: source <(cookbook/init sc ~/script_root $0)
 # init will print the wrapper functions needed to bootstrap
 # the sc function.
 # 
@@ -14,7 +14,9 @@
 COOKBOOK_DIR=`dirname $0`
 FUNCTION_NAME=$1
 SCRIPT_ROOT=$2
-if [[ "$SHELL" =~ "bash" ]]; then
+SHELL_TYPE=$3
+if [[ "$SHELL_TYPE" =~ "bash" ]]; then
+
     # completion is accomplished by thre parts:
     # 1. passing all possible completions to execute.py
     # 2. filtering for valid options using compgen
@@ -26,19 +28,24 @@ function ${FUNCTION_NAME} {
 
 function _${FUNCTION_NAME}_completions {
     # we remove the first argument, which states the function name.
-    shift
+    # shift
     # next reverse the order of the arguments. for some
     # reason completion returns arguments in reverse order.
-    local args i;
-    for i; do
-        args=\"\$i \$args\"
-    done 
-    cmd=\"$COOKBOOK_DIR/target/release/cookbook $SCRIPT_ROOT \$args --complete\"
-    all_options=\`$COOKBOOK_DIR/target/release/cookbook $SCRIPT_ROOT \$args --complete\`
+    cmd=\"$COOKBOOK_DIR/target/release/cookbook $SCRIPT_ROOT \${COMP_LINE:2} --complete\"
+    all_options=\`$COOKBOOK_DIR/target/release/cookbook $SCRIPT_ROOT \${COMP_LINE:2} --complete\`
     valid_options=\$(compgen -W \"\$all_options\" \"\${COMP_WORDS[COMP_CWORD]}\")
     COMPREPLY=(\$valid_options)
 }
 
 complete -F _${FUNCTION_NAME}_completions ${FUNCTION_NAME}
-"
+    ";
+
+elif [[ "$SHELL_TYPE" =~ "zsh" ]]; then
+
+    echo "
+function ${FUNCTION_NAME} {
+    \`$COOKBOOK_DIR/target/release/cookbook $SCRIPT_ROOT \$@\`
+}
+    ";
+
 fi

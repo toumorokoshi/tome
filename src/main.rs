@@ -76,7 +76,7 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
             }
             CommandType::Execute => {
                 return Err(format!(
-                    "echo {} is a directory. tab-complete to choose subcommands",
+                    "{} is a directory. tab-complete to choose subcommands",
                     target.to_str().unwrap_or("")
                 ))
             }
