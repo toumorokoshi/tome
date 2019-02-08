@@ -66,7 +66,7 @@ Put them in some known location (~/my-scripts). Initialize your shell with:
 
 ```
 # bash example, e.g. .bashrc
-source <(~/cookbook/init my-commands ~/my-scripts)
+source <(~/cookbook/init my-commands ~/my-scripts $0)
 ```
 
 

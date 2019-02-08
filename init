@@ -14,6 +14,7 @@
 COOKBOOK_DIR=`dirname $0`
 FUNCTION_NAME=$1
 SCRIPT_ROOT=$2
+COOKBOOK_EXECUTABLE=cookbook-linux
 # not named SHELL because it would collide with 
 # the shell environment variable.
 SHELL_TYPE=$3
@@ -29,7 +30,7 @@ if [[ "$SHELL_TYPE" =~ "bash" || "$SHELL_TYPE" =~ "zsh" ]]; then
     # 2. filtering for valid options using compgen
     # 3. appending to the valid option environment variable.
     function ${FUNCTION_NAME} {
-        \`$COOKBOOK_DIR/target/release/cookbook $SCRIPT_ROOT \$@\`
+        \`$COOKBOOK_DIR/$COOKBOOK_EXECUTABLE $SCRIPT_ROOT \$@\`
     }
 
     function _${FUNCTION_NAME}_completions {
@@ -37,8 +38,8 @@ if [[ "$SHELL_TYPE" =~ "bash" || "$SHELL_TYPE" =~ "zsh" ]]; then
         # shift
         # next reverse the order of the arguments. for some
         # reason completion returns arguments in reverse order.
-        cmd=\"$COOKBOOK_DIR/target/release/cookbook $SCRIPT_ROOT \${COMP_LINE:2} --complete\"
-        all_options=\`$COOKBOOK_DIR/target/release/cookbook $SCRIPT_ROOT \${COMP_LINE:2} --complete\`
+        cmd=\"$COOKBOOK_DIR/$SCRIPT_ROOT \${COMP_LINE:2} --complete\"
+        all_options=\`$COOKBOOK_DIR/$COOKBOOK_EXECUTABLE $SCRIPT_ROOT \${COMP_LINE:2} --complete\`
         valid_options=\$(compgen -W \"\$all_options\" \"\${COMP_WORDS[COMP_CWORD]}\")
         COMPREPLY=(\$valid_options)
     }
