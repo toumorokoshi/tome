@@ -13,10 +13,4 @@ export MACOSX_DEPLOYMENT_TARGET="10.9"
 # cross must also be installed
 # $ cargo install cross
 # cross build --target x86_64-pc-windows-gnu
-rm -r /tmp/cookbook-build
-cargo build --target=x86_64-unknown-linux-musl --release
-mkdir -p /tmp/cookbook-build
-cp ./init /tmp/cookbook-build/init
-cp ./target/x86_64-unknown-linux-musl/release/cookbook /tmp/cookbook-build/cookbook-linux
-cd /tmp/cookbook-build
-tar -zcvf cookbook.tar.gz *
+cross build --target=x86_64-unknown-linux-musl --release
