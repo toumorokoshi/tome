@@ -33,6 +33,7 @@ And add in some features for discoverability:
 
 * search all available commands
 * tab-completion
+* TBD: help commands
 * TBD: interactive search and autocomplete of commands
 
 ## Why?
