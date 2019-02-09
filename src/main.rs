@@ -23,25 +23,40 @@ enum TargetType {
 }
 
 pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
-    let mut args = raw_args.iter().peekable();
-    let mut target = PathBuf::from(&match args.next() {
+    let mut arguments = raw_args.iter().peekable();
+    // the first argument should be cookbook itself.
+    let cookbook_executable = match arguments.next() {
+        Some(arg) => arg,
+        None => {
+            return Err(String::from(
+                "0th argument should be the cookbook executable",
+            ))
+        }
+    };
+    let first_arg = match arguments.next() {
         Some(arg) => arg,
         None => return Err(String::from("at least one argument expected")),
-    });
+    };
+    // if the first command is init, then we should print the
+    // the contents of init, since a user is trying to instantiate.
+    if first_arg == "init" {
+        return commands::init(cookbook_executable, arguments);
+    }
+    let mut target = PathBuf::from(first_arg);
     // next, we determine if we have a file or a directory,
     // recursing down arguments until we've exhausted arguments
     // that match a directory or file.
-    let mut target_type = TargetType::File;
+    let mut target_type = TargetType::Directory;
     loop {
-        if let Some(arg) = args.peek() {
+        if let Some(arg) = arguments.peek() {
             target.push(arg);
             if target.is_file() {
                 target_type = TargetType::File;
-                args.next();
+                arguments.next();
                 break;
             } else if target.is_dir() {
                 target_type = TargetType::Directory;
-                args.next();
+                arguments.next();
             } else {
                 // the current argument does not match
                 // a directory or a file, so we've landed
@@ -56,7 +71,7 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
     let mut command_type = CommandType::Execute;
     let remaining_args = {
         let mut remaining_args = vec![];
-        for arg in args {
+        for arg in arguments {
             if arg == "--complete" {
                 command_type = CommandType::Completion;
             }
