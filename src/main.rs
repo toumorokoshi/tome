@@ -24,14 +24,10 @@ enum TargetType {
 
 pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
     let mut arguments = raw_args.iter().peekable();
-    // the first argument should be cookbook itself.
-    let cookbook_executable = match arguments.next() {
+    // the first argument should be location of the tome binary.
+    let tome_executable = match arguments.next() {
         Some(arg) => arg,
-        None => {
-            return Err(String::from(
-                "0th argument should be the cookbook executable",
-            ))
-        }
+        None => return Err(String::from("0th argument should be the tome binary")),
     };
     let first_arg = match arguments.next() {
         Some(arg) => arg,
@@ -40,7 +36,7 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
     // if the first command is init, then we should print the
     // the contents of init, since a user is trying to instantiate.
     if first_arg == "init" {
-        return commands::init(cookbook_executable, arguments);
+        return commands::init(tome_executable, arguments);
     }
     let mut target = PathBuf::from(first_arg);
     // next, we determine if we have a file or a directory,

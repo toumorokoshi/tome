@@ -1,4 +1,4 @@
-site_name: Cookbook Documentation
+site_name: Tome Documentation
 # pip install mkdocs-material
 theme:
   name: material

@@ -1,4 +1,4 @@
-# Cookbook
+# Tome
 
 Take a bunch of scripts, in directories of any depth:
 
@@ -23,17 +23,6 @@ $ my-command python start-virtualenv (executes root/python/start-virtualenv)
 $ my-command work my-team provision-my-service (executes root/work/my-team/provision-my-service)
 ```
 
+# Building Tome
 
-
-
-# Building Cookbook
-
-The final build package for this repo is a tarfile containing cross-compiled binaries.
-
-These instructions are for arch linux.
-
-## Install osxcross
-
-OSXCross is needed to build mac binaries.
-
-*  https://github.com/tpoechtrager/osxcross
+See bin/build-release-package

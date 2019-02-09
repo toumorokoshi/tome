@@ -1,8 +1,8 @@
-# Welcome to MkDocs
+# Introduction
 
-# Overview
+## What is Tome?
 
-This project attempts to provide easy organization
+Tome provides easy organization
 and execution of collections of command line scripts.
 
 Basically take a directory of scripts like this:
@@ -31,8 +31,8 @@ $ my-command work my-team provision-my-service
 
 And add in some features for discoverability:
 
-* search all available commands
 * tab-completion
+* search all available commands
 * TBD: help commands
 * TBD: interactive search and autocomplete of commands
 
@@ -46,7 +46,15 @@ This works well for a small group, but once you're trying to share scripts acros
 * namespacing: how do I find commands that relate to what I'm working on?
 * completion: It's nice
 
-## Usage
+## Getting Started
+
+### 1. Download Tome
+
+Tome is provided as self-encapsulated, broadly compatible binaries. Choose the latest binary that's appropriate for your OS at the [Github releases page](https://github.com/toumorokoshi/tome/releases).
+
+Download it into a well known, persistent location. A recommendedation is in your home directory, such as $HOME/bin/tome
+
+### 2. Create Your Shell Scripts
 
 Create a nested hierarchy of shell (or whatever) scripts:
 
@@ -63,33 +71,18 @@ root/
 
 (keeping these in version control is recommended)
 
-Put them in some known location (~/my-scripts). Initialize your shell with:
+Put them in a well known, persistent location as well (e.g. ~/my-scripts). 
+
+### 3. Put The Initialization Code in your .rc file
+
+If you want your top-level command
+to be named "my-commands" you'd put the following in your .bashrc or .zshrc:
 
 ```
 # bash example, e.g. .bashrc
-source <(~/cookbook/init my-commands ~/my-scripts $0)
+source <(~/bin/tome init my-commands ~/my-scripts $0)
 ```
 
+### 4. Start a New Shell
 
-
-
-
-
-You can 
-
-
-For full documentation visit [mkdocs.org](https://mkdocs.org).
-
-## Commands
-
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs help` - Print this help message.
-
-## Project layout
-
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+Once installed, start a new shell and you should have your new command!
