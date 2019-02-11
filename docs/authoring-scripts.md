@@ -18,10 +18,10 @@ Will result in the following being executed:
 
 Completion should return options for the last argument. More complex completion semantics, such as those offered by zsh, are not current available.
 
-You can see an example (here)[https://github.com/toumorokoshi/tome/blob/master/example/file_example] for more details.
+You can see an example [in the examples folder](https://github.com/toumorokoshi/tome/blob/master/example/file_example) for more details.
 
 ## SOURCE vs executed.
 
 If you want to write a script that modifies your current shell (e.g. navigate to a directory or set environment variables), you can author a script with "# SOURCE" as the first line. In this situation, if the script is invoked, the contents will be sourced instead of executed in a subprocess.
 
-You can see an example (here)[https://github.com/toumorokoshi/tome/blob/master/example/source_example] for more details.
+You can see an example [in the examples folder](https://github.com/toumorokoshi/tome/blob/master/example/source_example) for more details.

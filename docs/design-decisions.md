@@ -29,4 +29,7 @@ user    0m0.001s
 sys     0m0.003s
 ```
 
-## Why Source the Initialization Script?
+## Initialization Architecture
+
+The init command returns back shell code that results in the creation of two functions: the function itself, and the completion function. Both are responsible for passing arguments along to the tome executable, along with the arguments and context like the directory containing the shell scripts.
+
