@@ -19,9 +19,6 @@ pub struct Script {
     /// the string that should be printed
     /// when help is requested.
     pub help_string: String,
-    /// if the file should be sourced,
-    /// load the full body.
-    pub body: String,
 }
 
 impl Script {
@@ -35,7 +32,6 @@ impl Script {
         let mut help_string = String::new();
         let mut line = String::new();
         let mut consuming_help = false;
-        let mut body = String::new();
         loop {
             line.clear();
             match buffer.read_line(&mut line) {
@@ -63,30 +59,14 @@ impl Script {
                     // if a shebang is encountered, we skip.
                     // as it can indicate the command to run the script with.
                     // metadata lines must be consecutive.
-                    body.push_str(&line);
                     break;
                 }
-            }
-        }
-        // we should source, we read the rest of the body
-        if should_source {
-            loop {
-                match buffer.read_line(&mut line) {
-                    Ok(bytes_read) => {
-                        if bytes_read == 0 {
-                            break;
-                        }
-                    }
-                    Err(_) => break,
-                }
-                body.push_str(&line);
             }
         }
         Script {
             path,
             should_source,
             help_string,
-            body,
         }
     }
 

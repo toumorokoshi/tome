@@ -38,13 +38,26 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
     if first_arg == "init" {
         return commands::init(tome_executable, arguments);
     }
+
     let mut target = PathBuf::from(first_arg);
     // next, we determine if we have a file or a directory,
     // recursing down arguments until we've exhausted arguments
     // that match a directory or file.
     let mut target_type = TargetType::Directory;
+    let mut first_arg = true;
     loop {
         if let Some(arg) = arguments.peek() {
+            // this section can be used to add builtin commands.
+            if first_arg {
+                if *arg == "--help" {
+                    arguments.next();
+                    match commands::help(target.to_str().unwrap_or_default(), arguments) {
+                        Ok(message) => return Ok(message),
+                        Err(io_error) => return Err(format!("{}", io_error)),
+                    }
+                }
+            }
+            first_arg = false;
             target.push(arg);
             if target.is_file() {
                 target_type = TargetType::File;
@@ -89,7 +102,7 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
                 return Err(format!(
                     "{} is a directory. tab-complete to choose subcommands",
                     target.to_str().unwrap_or("")
-                ))
+                ));
             }
         },
         TargetType::File => match commands::Script::load(&target.to_str().unwrap_or_default()) {

@@ -1,3 +1,9 @@
+# Basic Scripts
+
+Any standard script executable by your shell is supported as is: just put it into the directory hierarchy and you're ready to go.
+
+Scripts must not be named with a leading dash! This namespace is reserved for tome commands (e.g. --help).
+
 # Writing Advanced Scripts
 
 Any standard script executable by your shell is supported as is: just put it into the directory hierarchy and you're ready to go.

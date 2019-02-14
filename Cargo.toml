@@ -5,5 +5,9 @@ authors = ["Yusuke Tsutsumi <yusuke@tsutsumi.io>"]
 edition = "2018"
 
 [dependencies]
+tui = "0.3.0"
+termion = "*"
+
+
 
 [dev-dependencies]
