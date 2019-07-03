@@ -45,7 +45,12 @@ fi
 # 2. filtering for valid options using compgen
 # 3. appending to the valid option environment variable.
 function {function_name} {{
-   `{cookbook_executable} {script_root} $@`
+   cmd=`{cookbook_executable} {script_root} $@`
+   # sometimes the output of cookbook includes
+   # empty strings, wrapped in quotes. in order
+   # to handle those, we need to eval rather than
+   # evaluate the variable directly.
+   eval $cmd
 }}
 
 function _{function_name}_completions {{

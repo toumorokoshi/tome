@@ -33,8 +33,8 @@ fn test_simple_script_completion() {
 #[test]
 fn test_source() {
     assert_eq!(
-        execute(_vec_str(vec!["tome", EXAMPLE_DIR, "source_example"])),
-        Ok(format!("source {}/source_example", EXAMPLE_DIR))
+        execute(_vec_str(vec!["tome", EXAMPLE_DIR, "source_example",])),
+        Ok(format!("source {}/source_example \"\"", EXAMPLE_DIR))
     );
 }
 
@@ -71,7 +71,7 @@ fn test_directory_completion() {
 fn test_root_directory_completion() {
     assert_eq!(
         execute(_vec_str(vec!["tome", EXAMPLE_DIR, "--complete"])),
-        Ok("source_example file_example dir_example".to_string())
+        Ok("source_example file_example use-arg dir_example".to_string())
     );
 }
 
@@ -82,5 +82,15 @@ fn test_script_in_directory() {
     assert_eq!(
         execute(_vec_str(vec!["tome", EXAMPLE_DIR, "dir_example", "foo"])),
         Ok(format!("{}/dir_example/foo", EXAMPLE_DIR))
+    );
+}
+
+/// if completion is requested on a directory,
+/// return the list of file and directories in there.
+#[test]
+fn test_use_arg() {
+    assert_eq!(
+        execute(_vec_str(vec!["tome", EXAMPLE_DIR, "use-arg"])),
+        Ok(format!("source {}/use-arg \"\"", EXAMPLE_DIR))
     );
 }

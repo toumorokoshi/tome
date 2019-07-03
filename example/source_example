@@ -6,7 +6,7 @@
 # effectively, you have similar behavior you would have with
 # a shell function.
 # END HELP
-if [ "$1" == "--complete" ]; then
+if [ "$1" = "--complete" ]; then
     echo "foo baz"
     exit
 fi

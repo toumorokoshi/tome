@@ -106,9 +106,15 @@ impl Script {
             CommandType::Execute => {
                 if self.should_source {
                     // when sourcing, just return the full body.
-                    let mut command = vec![String::from("source"), self.path.clone()];
+                    let mut command = vec![String::from("."), self.path.clone()];
                     for arg in args.iter() {
                         command.push((**arg).clone());
+                    }
+                    // in the case of sourcing, at least one variable needs
+                    // to be specified, or else arguments will be inherited
+                    // from the parent process.
+                    if command.len() == 2 {
+                        command.push(String::from("''"));
                     }
                     Ok(command.join(" ").to_owned())
                 } else {
