@@ -45,21 +45,23 @@ fi
 # 2. filtering for valid options using compgen
 # 3. appending to the valid option environment variable.
 function {function_name} {{
-   cmd=`{cookbook_executable} {script_root} $@`
-   # sometimes the output of cookbook includes
-   # empty strings, wrapped in quotes. in order
-   # to handle those, we need to eval rather than
-   # evaluate the variable directly.
-   eval $cmd
+    local cmd
+    cmd=`{cookbook_executable} {script_root} $@`
+    # sometimes the output of cookbook includes
+    # empty strings, wrapped in quotes. in order
+    # to handle those, we need to eval rather than
+    # evaluate the variable directly.
+    eval $cmd
 }}
 
 function _{function_name}_completions {{
-    # we remove the first argument, which states the function name.
-    # shift
-    # next reverse the order of the arguments. for some
-    # reason completion returns arguments in reverse order.
-    all_options=`{cookbook_executable} {script_root} ${{COMP_LINE:2}} --complete`
-    valid_options=$(compgen -W "$all_options" "${{COMP_WORDS[COMP_CWORD]}}")
+    local token_to_complete cookbook_args
+    token_to_complete="${{COMP_WORDS[COMP_CWORD]}}";
+    cookbook_args=${{COMP_LINE:2}};  # strip the first argument prefix, which is the function name
+    # strip the partial token_to_complete, if there is one
+    cookbook_args=${{cookbook_args%$token_to_complete}};
+    all_options=`{cookbook_executable} {script_root} $cookbook_args --complete`
+    valid_options=$(compgen -W "$all_options" "$token_to_complete")
     COMPREPLY=($valid_options)
 }}
 
