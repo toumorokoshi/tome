@@ -1,8 +1,10 @@
 use std::{env::args, fs, path::PathBuf};
 
 mod commands;
+mod directory;
 #[cfg(test)]
 mod tests;
+
 
 pub fn main() {
     let args: Vec<String> = args().peekable().collect();
@@ -47,7 +49,7 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
     let mut first_arg = true;
     loop {
         if let Some(arg) = arguments.peek() {
-            // this section can be used to add builtin commands.
+            // match against builtin commands
             if first_arg {
                 if *arg == "--help" {
                     arguments.next();

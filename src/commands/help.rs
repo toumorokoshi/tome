@@ -1,27 +1,25 @@
+use super::super::directory::scan_directory;
 use std::{io, iter::Peekable, slice::Iter};
-use termion::raw::IntoRawMode;
-use tui::{
-    backend::TermionBackend,
-    layout::{Constraint, Direction, Layout},
-    widgets::{Block, Borders, Widget},
-    Terminal,
-};
-/// the help command brings up a TUI
-/// interactive help interface, to help
-/// find scripts.
-pub fn help(root: &str, mut args: Peekable<Iter<String>>) -> Result<String, io::Error> {
-    let stdout = io::stdout().into_raw_mode()?;
-    let backend = TermionBackend::new(stdout);
-    let mut terminal = Terminal::new(backend)?;
-    let size = terminal.size()?;
-    terminal.hide_cursor()?;
-    loop {
-        terminal.draw(|mut f| {
-            Block::default()
-                .title("Interactive Help")
-                .borders(Borders::ALL)
-                .render(&mut f, size);
-        })?;
+
+macro_rules! help_template {
+    () => {
+        r#"echo -e
+'This is an instance of tome, running against the directory {}.
+\nThe commands are namespaced by the directory structure.
+\nFull list of commands available are:
+\n    {}
+';"#;
+    };
+}
+
+pub fn help(root: &str, mut _args: Peekable<Iter<String>>) -> io::Result<String> {
+    let mut commands_with_help = vec![];
+    for (command, script) in scan_directory(root, &mut vec![])? {
+        commands_with_help.push(format!("    {}: {}", command, script.help_string));
     }
-    Ok(String::from(""))
+    return Ok(format!(
+        help_template!(),
+        root,
+        commands_with_help.join("\\n")
+    ));
 }
