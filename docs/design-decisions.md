@@ -29,6 +29,26 @@ user    0m0.001s
 sys     0m0.003s
 ```
 
+In addition, this has a significant performance advantage over bash as well. Compare the help operation in sub vs tome:
+
+Example of calling help using sub (bash):
+
+```
+$ time sub
+real    0m0.122s
+user    0m0.081s
+sys     0m0.053s
+```
+
+Example of calling help using tome (rust):
+
+```
+$ time s
+real    0m0.003s
+user    0m0.003s
+sys     0m0.000s
+```
+
 ## Initialization Architecture
 
 The init command returns back shell code that results in the creation of two functions: the function itself, and the completion function. Both are responsible for passing arguments along to the tome executable, along with the arguments and context like the directory containing the shell scripts.
