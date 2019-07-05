@@ -5,7 +5,6 @@ mod directory;
 #[cfg(test)]
 mod tests;
 
-
 pub fn main() {
     let args: Vec<String> = args().peekable().collect();
     match execute(args) {
@@ -47,6 +46,13 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
     // that match a directory or file.
     let mut target_type = TargetType::Directory;
     let mut first_arg = true;
+    // if no argument is passed, return help.
+    if let None = arguments.peek() {
+        match commands::help(target.to_str().unwrap_or_default(), arguments) {
+            Ok(message) => return Ok(message),
+            Err(io_error) => return Err(format!("{}", io_error)),
+        }
+    }
     loop {
         if let Some(arg) = arguments.peek() {
             // match against builtin commands
