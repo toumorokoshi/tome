@@ -100,9 +100,14 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
         TargetType::Directory => match command_type {
             CommandType::Completion => {
                 let mut result = vec![];
-                let paths = fs::read_dir(target.to_str().unwrap_or("")).unwrap();
-                for path in paths {
-                    result.push(path.unwrap().file_name().to_str().unwrap_or("").to_owned());
+                let mut paths: Vec<_> = fs::read_dir(target.to_str().unwrap_or("")).unwrap().map(|r| r.unwrap()).collect();
+                paths.sort_by_key(|f| f.path());
+                for path_buf in paths {
+                    let path = path_buf.path();
+                    if path.is_dir() && !directory::is_tome_script_directory(&path) {
+                        continue;
+                    }
+                    result.push(path.file_name().unwrap().to_str().unwrap_or("").to_owned());
                 }
                 result.join(" ").to_owned()
             }

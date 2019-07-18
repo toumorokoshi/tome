@@ -15,11 +15,21 @@ macro_rules! help_template {
 pub fn help(root: &str, mut _args: Peekable<Iter<String>>) -> io::Result<String> {
     let mut commands_with_help = vec![];
     for (command, script) in scan_directory(root, &mut vec![])? {
-        commands_with_help.push(format!("    {}: {}", command, script.help_string));
+        commands_with_help.push(format!(
+            "    {}: {}",
+            escape_slashes(&command),
+            escape_slashes(&script.usage_string)
+        ))
     }
     return Ok(format!(
         help_template!(),
         root,
         commands_with_help.join("\\n")
     ));
+}
+
+// escape slash characters with posix-compatible quotes. Helps if the echo
+// command uses slashes
+fn escape_slashes(s: &str) -> String {
+    s.replace("'", "'\\''")
 }

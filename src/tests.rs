@@ -71,7 +71,7 @@ fn test_directory_completion() {
 fn test_root_directory_completion() {
     assert_eq!(
         execute(_vec_str(vec!["tome", EXAMPLE_DIR, "--complete"])),
-        Ok("source_example practical_examples file_example use-arg dir_example".to_string())
+        Ok("dir_example file_example practical_examples source_example use-arg".to_string())
     );
 }
 
@@ -93,4 +93,13 @@ fn test_use_arg() {
         execute(_vec_str(vec!["tome", EXAMPLE_DIR, "use-arg"])),
         Ok(format!(". {}/use-arg ''", EXAMPLE_DIR))
     );
+}
+
+/// help should be returned in no arguments are passed
+#[test]
+fn test_help_page() {
+    let result = execute(_vec_str(vec!["tome", EXAMPLE_DIR])).unwrap();
+    assert_eq!(result.matches("'\''").count(), 1);
+    assert_eq!(result.matches("'").count(), 3);
+    assert!(result.contains("echo -e"));
 }

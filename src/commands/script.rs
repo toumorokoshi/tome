@@ -19,17 +19,21 @@ pub struct Script {
     /// the string that should be printed
     /// when help is requested.
     pub help_string: String,
+    /// the string that should be used for
+    /// usage information
+    pub usage_string: String,
 }
 
 impl Script {
     pub fn load(path: &str) -> io::Result<Script> {
-        let file = Box::new(File::open(path)?) as Box<Read>;
+        let file = Box::new(File::open(path)?) as Box<dyn Read>;
         Ok(Script::load_from_buffer(path.to_owned(), file))
     }
-    pub fn load_from_buffer(path: String, body: Box<Read>) -> Script {
+    pub fn load_from_buffer(path: String, body: Box<dyn Read>) -> Script {
         let mut buffer = BufReader::new(body);
         let mut should_source = false;
         let mut help_string = String::new();
+        let mut usage_string = String::new();
         let mut line = String::new();
         let mut consuming_help = false;
         loop {
@@ -55,6 +59,9 @@ impl Script {
                     should_source = true;
                 } else if line.starts_with("# START HELP") {
                     consuming_help = true;
+                } else if line.starts_with("# USAGE: ") {
+                    // 9 = prefix, -1 strips newline
+                    usage_string.push_str(&line[9..(line.len() - 1)]);
                 } else if !line.starts_with("#!") {
                     // if a shebang is encountered, we skip.
                     // as it can indicate the command to run the script with.
@@ -67,6 +74,7 @@ impl Script {
             path,
             should_source,
             help_string,
+            usage_string,
         }
     }
 
