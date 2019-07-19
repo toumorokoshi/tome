@@ -18,7 +18,7 @@ pub fn help(root: &str, mut _args: Peekable<Iter<String>>) -> io::Result<String>
         commands_with_help.push(format!(
             "    {}: {}",
             escape_slashes(&command),
-            escape_slashes(&script.usage_string)
+            escape_slashes(&script.summary_string)
         ))
     }
     return Ok(format!(

@@ -1,5 +1,5 @@
 # SOURCE
-# USAGE: an example for sourcing variables
+# SUMMARY: an example for sourcing variables
 # START HELP
 # This is an example of a script that is sourced, rather
 # than executed. This means that anything you run in here

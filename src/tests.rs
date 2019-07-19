@@ -99,7 +99,8 @@ fn test_use_arg() {
 #[test]
 fn test_help_page() {
     let result = execute(_vec_str(vec!["tome", EXAMPLE_DIR])).unwrap();
-    assert_eq!(result.matches("'\''").count(), 1);
-    assert_eq!(result.matches("'").count(), 3);
+    println!("{}", result);
+    assert_eq!(result.matches("'\\''").count(), 1);
+    assert_eq!(result.matches("'").count(), 5);
     assert!(result.contains("echo -e"));
 }

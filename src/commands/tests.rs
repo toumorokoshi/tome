@@ -10,7 +10,7 @@ fn test_should_source() {
             "# SOURCE
 cd /tmp/
     ",
-        )) as Box<Read>,
+        )) as Box<dyn Read>,
     );
     assert_eq!(script.should_source, true);
 }
@@ -25,7 +25,7 @@ fn test_should_not_source() {
             "#!/usr/bin/env bash
 echo foo
     ",
-        )) as Box<Read>,
+        )) as Box<dyn Read>,
     );
     assert_eq!(script.should_source, false);
 }
@@ -40,7 +40,7 @@ fn test_help() {
 # foo bar baz
 # END HELP
     ",
-        )) as Box<Read>,
+        )) as Box<dyn Read>,
     );
     assert_eq!(&script.help_string, "foo bar baz\n");
 }
@@ -51,12 +51,12 @@ fn test_usage() {
         String::from("./example/foo"),
         Box::new(Cursor::new(
             "#!/usr/bin/env bash
-# USAGE: this is the usage
+# SUMMARY: this is the usage
 # START HELP
 # foo bar baz
 # END HELP
     ",
-        )) as Box<Read>,
+        )) as Box<dyn Read>,
     );
-    assert_eq!(&script.usage_string, "this is the usage");
+    assert_eq!(&script.summary_string, "this is the usage");
 }
