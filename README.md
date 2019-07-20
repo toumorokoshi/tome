@@ -23,6 +23,4 @@ $ my-command python start-virtualenv (executes root/python/start-virtualenv)
 $ my-command work my-team provision-my-service (executes root/work/my-team/provision-my-service)
 ```
 
-# Building Tome
-
-See bin/build-release-package
+Learn more at the [docs](https://tome-scripts.readthedocs.io/en/latest/).
