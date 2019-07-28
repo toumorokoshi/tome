@@ -60,7 +60,7 @@ function _{function_name}_completions {{
     cookbook_args=${{COMP_LINE:2}};  # strip the first argument prefix, which is the function name
     # strip the partial token_to_complete, if there is one
     cookbook_args=${{cookbook_args%$token_to_complete}};
-    all_options=`{cookbook_executable} {script_root} $cookbook_args --complete`
+    all_options=`{cookbook_executable} {script_root} --complete $cookbook_args`
     valid_options=$(compgen -W "$all_options" "$token_to_complete")
     COMPREPLY=($valid_options)
 }}

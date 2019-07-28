@@ -22,8 +22,8 @@ fn test_simple_script_completion() {
         execute(_vec_str(vec![
             "tome",
             EXAMPLE_DIR,
+            "--complete",
             "file_example",
-            "--complete"
         ])),
         Ok(String::from("file autocomplete example"))
     );
@@ -44,8 +44,8 @@ fn test_source_completion() {
         execute(_vec_str(vec![
             "tome",
             EXAMPLE_DIR,
+            "--complete",
             "source_example",
-            "--complete"
         ])),
         Ok(String::from("foo baz\n"))
     );
@@ -59,8 +59,8 @@ fn test_directory_completion() {
         execute(_vec_str(vec![
             "tome",
             EXAMPLE_DIR,
+            "--complete",
             "dir_example",
-            "--complete"
         ])),
         Ok("bar foo".to_string())
     );

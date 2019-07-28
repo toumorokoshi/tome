@@ -1,18 +1,25 @@
 # SOURCE
-if [ ! -d ~/sandbox ]; then
-    mkdir -p ~/sandbox
+# SUMMARY: navigate to a directory within the ~/sandbox directory
+root=$HOME/sandbox
+if [ ! -d $root ]; then
+    mkdir -p $root
 fi
 
 local target_path path_element
-target_path="$HOME/sandbox"
+target_path="$root"
+if [ "$1" == "--complete" ]; then
+  shift
+  run_completion=true
+fi
+
 for path_element in "$@"
 do
-  if [[ "$path_element" = "--complete" ]]; then
-    ls $target_path
-    exit
-  fi
   target_path="$target_path/$path_element"
 done
 
-echo $target_path
-cd $target_path
+if [ -z "$run_completion" ]; then
+  cd $target_path
+else
+  ls $target_path
+fi
+

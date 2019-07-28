@@ -15,15 +15,13 @@ $ time ./execute.py ~/workspace/tome/example dir_example --complete
 bar foo
 
 real    0m0.119s
-user    0m0.086s
+user    0m0.086sj
 sys     0m0.038s
 ```
 
 Rust:
 
-```
-$ time ./target/release/tome ~/workspace/tome/example dir_example --complete
-bar foo
+``` $ time ./target/release/tome ~/workspace/tome/example dir_example --complete bar foo
 real    0m0.004s
 user    0m0.001s
 sys     0m0.003s
@@ -53,3 +51,11 @@ sys     0m0.000s
 
 The init command returns back shell code that results in the creation of two functions: the function itself, and the completion function. Both are responsible for passing arguments along to the tome executable, along with the arguments and context like the directory containing the shell scripts.
 
+## Completion: why pass --complete as the first argument?
+
+Completion mode for sub commands is activated by passing "--complete" in as the first argument. This is done as there is not a succinct way in POSIX shell scripts to get something more dynamic, such as the last argument. Consider this example in bourne shell:
+
+    # last argument
+    for LAST_ARGUMENT; do true; done
+    # first argument
+    FIRST_ARG=$1

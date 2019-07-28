@@ -47,6 +47,7 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
     // that match a directory or file.
     let mut target_type = TargetType::Directory;
     let mut first_arg = true;
+    let mut command_type = CommandType::Execute;
     // if no argument is passed, return help.
     if let None = arguments.peek() {
         match commands::help(target.to_str().unwrap_or_default(), arguments) {
@@ -58,12 +59,20 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
         if let Some(arg) = arguments.peek() {
             // match against builtin commands
             if first_arg {
-                if *arg == "--help" {
-                    arguments.next();
-                    match commands::help(target.to_str().unwrap_or_default(), arguments) {
-                        Ok(message) => return Ok(message),
-                        Err(io_error) => return Err(format!("{}", io_error)),
+                match arg.as_ref() {
+                    "--help" => {
+                        arguments.next();
+                        match commands::help(target.to_str().unwrap_or_default(), arguments) {
+                            Ok(message) => return Ok(message),
+                            Err(io_error) => return Err(format!("{}", io_error)),
+                        }
                     }
+                    "--complete" => {
+                        arguments.next();
+                        command_type = CommandType::Completion;
+                        continue;
+                    }
+                    _ => {}
                 }
             }
             first_arg = false;
@@ -86,13 +95,9 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
             break;
         }
     }
-    let mut command_type = CommandType::Execute;
     let remaining_args = {
         let mut remaining_args = vec![];
         for arg in arguments {
-            if arg == "--complete" {
-                command_type = CommandType::Completion;
-            }
             remaining_args.push(arg);
         }
         remaining_args

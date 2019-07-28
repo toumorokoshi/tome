@@ -97,6 +97,7 @@ impl Script {
                 if self.should_source {
                     command.arg(self.path.clone());
                 }
+                command.arg("--complete");
                 let command_output = command.args(args).stdout(Stdio::piped()).output();
                 match command_output {
                     Ok(output) => match String::from_utf8(output.stdout) {
