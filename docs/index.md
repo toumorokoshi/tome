@@ -27,14 +27,15 @@ $ my-command go-to-workspace
 $ my-command android debug
 $ my-command work start-my-server
 $ my-command work my-team provision-my-service
+# print a list of all commands and usage
+$ my-command
 ```
 
 And add in some features for discoverability:
 
 * tab-completion
-* search all available commands
-* TBD: help commands
-* TBD: interactive search and autocomplete of commands
+* search all available commands (just enter your command with no arguments)
+* TODO: help commands
 
 ## Why?
 
@@ -79,9 +80,12 @@ If you want your top-level command
 to be named "my-commands" you'd put the following in your .bashrc or .zshrc:
 
 ```
-# bash example, e.g. .bashrc
-source <(~/bin/tome init my-commands ~/my-scripts $0)
+# posix example, e.g. .bashrc
+eval "`~/bin/tome init my-commands ~/my-scripts $0`"
 ```
+
+*NOTE*: make sure to include the double quotes with the nested backticks. This ensures that newlines are captured
+and evaluated appropriately.
 
 ### 4. Start a New Shell
 
