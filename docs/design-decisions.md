@@ -15,13 +15,14 @@ $ time ./execute.py ~/workspace/tome/example dir_example --complete
 bar foo
 
 real    0m0.119s
-user    0m0.086sj
+user    0m0.086s
 sys     0m0.038s
 ```
 
 Rust:
 
-``` $ time ./target/release/tome ~/workspace/tome/example dir_example --complete bar foo
+``` 
+$ time ./target/release/tome ~/workspace/tome/example dir_example --complete bar foo
 real    0m0.004s
 user    0m0.001s
 sys     0m0.003s

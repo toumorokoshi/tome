@@ -37,7 +37,17 @@ macro_rules! bash_zsh_init_body {
     () => {
         r#"
 if [[ -n ${{ZSH_VERSION-}} ]]; then
-    autoload -U +X bashcompinit && bashcompinit
+    # bash completion emulation requires that zsh's  completion has 
+    # already been initialized. In addition, running the autoload 
+    # expression with the ampersands seems to always result in 
+    # compinit being executed, which clear completions that were
+    # previously bound by tome, resulting in the inability to 
+    # instantiate multiple tome command sets.
+    if ! type complete > /dev/null; then
+        autoload +X compinit && compinit
+    fi
+    autoload +X bashcompinit && bashcompinit
+
 fi
 
 # completion is accomplished by three parts:
@@ -45,13 +55,10 @@ fi
 # 2. filtering for valid options using compgen
 # 3. appending to the valid option environment variable.
 function {function_name} {{
-    local cmd
-    cmd=`{cookbook_executable} {script_root} $@`
-    # sometimes the output of cookbook includes
-    # empty strings, wrapped in quotes. in order
-    # to handle those, we need to eval rather than
-    # evaluate the variable directly.
-    eval $cmd
+    # capturing the results as a variable led to the command
+    # being to long for zsh to execute. (literally raising
+    # "command too long" )
+    eval `{cookbook_executable} {script_root} $@`
 }}
 
 function _{function_name}_completions {{
