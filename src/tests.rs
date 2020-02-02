@@ -12,7 +12,7 @@ fn _vec_str(args: Vec<&str>) -> Vec<String> {
 fn test_simple_script() {
     assert_eq!(
         execute(_vec_str(vec!["tome", EXAMPLE_DIR, "file_example"])),
-        Ok(format!("{}/file_example", EXAMPLE_DIR))
+        Ok(format!("'{}/file_example'", EXAMPLE_DIR))
     );
 }
 
@@ -34,7 +34,7 @@ fn test_simple_script_completion() {
 fn test_source() {
     assert_eq!(
         execute(_vec_str(vec!["tome", EXAMPLE_DIR, "source_example",])),
-        Ok(format!(". {}/source_example ''", EXAMPLE_DIR))
+        Ok(format!("'.' '{}/source_example' ''", EXAMPLE_DIR))
     );
 }
 
@@ -81,17 +81,28 @@ fn test_root_directory_completion() {
 fn test_script_in_directory() {
     assert_eq!(
         execute(_vec_str(vec!["tome", EXAMPLE_DIR, "dir_example", "foo"])),
-        Ok(format!("{}/dir_example/foo", EXAMPLE_DIR))
+        Ok(format!("'{}/dir_example/foo'", EXAMPLE_DIR))
     );
 }
 
-/// if completion is requested on a directory,
-/// return the list of file and directories in there.
+/// if there is no argument passed in for sourcing, an argument will
+/// be added, to ensure that shells don't inherit arguments from the initial shell
+/// command.
 #[test]
 fn test_use_arg() {
     assert_eq!(
         execute(_vec_str(vec!["tome", EXAMPLE_DIR, "use-arg"])),
-        Ok(format!(". {}/use-arg ''", EXAMPLE_DIR))
+        Ok(format!("'.' '{}/use-arg' ''", EXAMPLE_DIR))
+    );
+}
+
+/// to ensure that character sequences that have special meaning to
+/// the shell are not interpreted as such, all values should be single quoted.
+#[test]
+fn test_dangerous_characters_quoted() {
+    assert_eq!(
+        execute(_vec_str(vec!["tome", EXAMPLE_DIR, "use-arg"])),
+        Ok(format!("'.' '{}/use-arg' ''", EXAMPLE_DIR))
     );
 }
 

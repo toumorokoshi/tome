@@ -113,7 +113,7 @@ impl Script {
                 }
             }
             CommandType::Execute => {
-                if self.should_source {
+                let command_string = if self.should_source {
                     // when sourcing, just return the full body.
                     let mut command = vec![String::from("."), self.path.clone()];
                     for arg in args.iter() {
@@ -123,18 +123,23 @@ impl Script {
                     // to be specified, or else arguments will be inherited
                     // from the parent process.
                     if command.len() == 2 {
-                        command.push(String::from("''"));
+                        command.push(String::from(""));
                     }
-                    Ok(command.join(" ").to_owned())
+                    command
                 } else {
-                    // the command should be run directly by the outer shell, so
-                    // output that.
-                    let mut command = vec![self.path.clone()];
-                    for arg in args.iter() {
-                        command.push((**arg).clone());
-                    }
-                    Ok(command.join(" ").to_owned())
+                    vec![self.path.clone()]
+                };
+                // after figuring out the command, all resolved values
+                // should be quoted, to ensure that the shell does not
+                // interpret character sequences.
+                let mut escaped_command_string = vec![];
+                for mut arg in command_string {
+                    arg = arg.replace("'", "\\'");
+                    arg.insert(0, '\'');
+                    arg.push('\'');
+                    escaped_command_string.push(arg);
                 }
+                Ok(escaped_command_string.join(" ").to_owned())
             }
         }
     }
