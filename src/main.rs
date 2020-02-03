@@ -128,10 +128,17 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
                 result.join(" ").to_owned()
             }
             CommandType::Execute => {
-                return Err(format!(
-                    "{} is a directory. tab-complete to choose subcommands",
-                    target.to_str().unwrap_or("")
-                ));
+                return match remaining_args.len() {
+                    0 => Err(format!(
+                        "{} is a directory. tab-complete to choose subcommands",
+                        target.to_str().unwrap_or("")
+                    )),
+                    _ => Err(format!(
+                        "command {} not found in directory {}",
+                        remaining_args[0],
+                        target.to_str().unwrap_or("")
+                    )),
+                };
             }
         },
         TargetType::File => match commands::Script::load(&target.to_str().unwrap_or_default()) {

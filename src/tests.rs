@@ -85,6 +85,37 @@ fn test_script_in_directory() {
     );
 }
 
+/// if the script is not found in the directory, provide
+/// a clear error message.
+#[test]
+fn test_script_in_directory_not_found() {
+    assert_eq!(
+        execute(_vec_str(vec![
+            "tome",
+            EXAMPLE_DIR,
+            "dir_example",
+            "foo-nonexistent",
+            "baz"
+        ])),
+        Err(format!(
+            "command foo-nonexistent not found in directory {}/dir_example",
+            EXAMPLE_DIR
+        ))
+    );
+}
+
+/// completing to a directory emits the directory name and some help.
+#[test]
+fn test_script_directory_argument() {
+    assert_eq!(
+        execute(_vec_str(vec!["tome", EXAMPLE_DIR, "dir_example",])),
+        Err(format!(
+            "{}/dir_example is a directory. tab-complete to choose subcommands",
+            EXAMPLE_DIR
+        ))
+    );
+}
+
 /// if there is no argument passed in for sourcing, an argument will
 /// be added, to ensure that shells don't inherit arguments from the initial shell
 /// command.
