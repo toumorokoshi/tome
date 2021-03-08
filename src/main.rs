@@ -91,13 +91,7 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
             break;
         }
     }
-    let remaining_args = {
-        let mut remaining_args = vec![];
-        for arg in arguments {
-            remaining_args.push(arg);
-        }
-        remaining_args
-    };
+    let remaining_args: Vec<_> = arguments.collect();
     let output: String = match target_type {
         TargetType::Directory => match command_type {
             CommandType::Completion => {
