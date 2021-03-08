@@ -7,12 +7,12 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'cookbook'",
+            "name": "Debug executable 'tome'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=cookbook",
-                    "--package=cookbook"
+                    "--bin=tome",
+                    "--package=tome"
                 ],
                 "filter": {
                     "kind": "bin"
@@ -24,13 +24,13 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'cookbook'",
+            "name": "Debug unit tests in executable 'tome'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=cookbook",
-                    "--package=cookbook"
+                    "--bin=tome",
+                    "--package=tome"
                 ],
                 "filter": {
                     "kind": "bin"

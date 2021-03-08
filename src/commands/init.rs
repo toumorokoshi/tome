@@ -10,9 +10,9 @@ macro_rules! init_help_body {
         r#""
 error: {}
 
-An example cookbook init invocation looks like:
+An example tome init invocation looks like:
 
-source <(./cookbook init sc ~/my_script_dir $0)
+source <(./tome init sc ~/my_script_dir $0)
 
 The positional arguments are:
 
@@ -22,7 +22,7 @@ The positional arguments are:
 4. the shell you want to use. Using the $0 argument here is recommended,
    as in shells that is the name of the shell in use.
 
-The "source" is important as cookbook init will print a shell snippet
+The "source" is important as tome init will print a shell snippet
 that should be executed to bootstrap your command. the <() syntax creates
 a file descriptor that the output has been written to, that should be sourced.
 "#
@@ -58,16 +58,16 @@ function {function_name} {{
     # capturing the results as a variable led to the command
     # being to long for zsh to execute. (literally raising
     # "command too long" )
-    eval `{cookbook_executable} {script_root} $@`
+    eval `{tome_executable} {script_root} $@`
 }}
 
 function _{function_name}_completions {{
-    local token_to_complete cookbook_args
+    local token_to_complete tome_args
     token_to_complete="${{COMP_WORDS[COMP_CWORD]}}";
-    cookbook_args=${{COMP_LINE:2}};  # strip the first argument prefix, which is the function name
+    tome_args=${{COMP_LINE:2}};  # strip the first argument prefix, which is the function name
     # strip the partial token_to_complete, if there is one
-    cookbook_args=${{cookbook_args%$token_to_complete}};
-    all_options=`{cookbook_executable} {script_root} --complete $cookbook_args`
+    tome_args=${{tome_args%$token_to_complete}};
+    all_options=`{tome_executable} {script_root} --complete $tome_args`
     valid_options=$(compgen -W "$all_options" "$token_to_complete")
     COMPREPLY=($valid_options)
 }}
@@ -77,10 +77,10 @@ complete -F _{function_name}_completions {function_name}
     };
 }
 
-// given the location of the cookbook executable, return
-// back the init script for cookbook.
+// given the location of the tome executable, return
+// back the init script for tome.
 
-pub fn init(cookbook_executable: &str, mut args: Peekable<Iter<String>>) -> Result<String, String> {
+pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>) -> Result<String, String> {
     let function_name = match args.next() {
         Some(arg) => arg,
         None => {
@@ -113,13 +113,13 @@ pub fn init(cookbook_executable: &str, mut args: Peekable<Iter<String>>) -> Resu
     // 2. wiring up tab completion for the function.
     //
     // functions must be used instead of a script, as
-    // cookbook also supports commands that modify the
+    // tome also supports commands that modify the
     // current environment (such as cd you into a specific)
     // directory.
     // TODO: add conditionals if other shells need different support
     Ok(format!(
         bash_zsh_init_body!(),
-        cookbook_executable = cookbook_executable,
+        tome_executable = tome_executable,
         script_root = script_root,
         function_name = function_name
     ))
