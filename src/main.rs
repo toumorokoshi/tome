@@ -49,49 +49,45 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
     let mut first_arg = true;
     let mut command_type = CommandType::Execute;
     // if no argument is passed, return help.
-    if let None = arguments.peek() {
+    if arguments.peek().is_none() {
         match commands::help(target.to_str().unwrap_or_default(), arguments) {
             Ok(message) => return Ok(message),
             Err(io_error) => return Err(format!("{}", io_error)),
         }
     }
-    loop {
-        if let Some(arg) = arguments.peek() {
-            // match against builtin commands
-            if first_arg {
-                match arg.as_ref() {
-                    "--help" => {
-                        arguments.next();
-                        match commands::help(target.to_str().unwrap_or_default(), arguments) {
-                            Ok(message) => return Ok(message),
-                            Err(io_error) => return Err(format!("{}", io_error)),
-                        }
+    while let Some(arg) = arguments.peek() {
+        // match against builtin commands
+        if first_arg {
+            match arg.as_ref() {
+                "--help" => {
+                    arguments.next();
+                    match commands::help(target.to_str().unwrap_or_default(), arguments) {
+                        Ok(message) => return Ok(message),
+                        Err(io_error) => return Err(format!("{}", io_error)),
                     }
-                    "--complete" => {
-                        arguments.next();
-                        command_type = CommandType::Completion;
-                        continue;
-                    }
-                    _ => {}
                 }
+                "--complete" => {
+                    arguments.next();
+                    command_type = CommandType::Completion;
+                    continue;
+                }
+                _ => {}
             }
-            first_arg = false;
-            target.push(arg);
-            if target.is_file() {
-                target_type = TargetType::File;
-                arguments.next();
-                break;
-            } else if target.is_dir() {
-                target_type = TargetType::Directory;
-                arguments.next();
-            } else {
-                // the current argument does not match
-                // a directory or a file, so we've landed
-                // on the strictest match.
-                target.pop();
-                break;
-            }
+        }
+        first_arg = false;
+        target.push(arg);
+        if target.is_file() {
+            target_type = TargetType::File;
+            arguments.next();
+            break;
+        } else if target.is_dir() {
+            target_type = TargetType::Directory;
+            arguments.next();
         } else {
+            // the current argument does not match
+            // a directory or a file, so we've landed
+            // on the strictest match.
+            target.pop();
             break;
         }
     }
@@ -125,7 +121,7 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
                     }
                     result.push(path.file_name().unwrap().to_str().unwrap_or("").to_owned());
                 }
-                result.join(" ").to_owned()
+                result.join(" ")
             }
             CommandType::Execute => {
                 return match remaining_args.len() {
@@ -146,5 +142,5 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
             Err(error) => return Err(format!("IOError loading file: {:?}", error)),
         },
     };
-    return Ok(output);
+    Ok(output)
 }
