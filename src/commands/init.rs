@@ -14,7 +14,11 @@ error: {}
 
 An example tome init invocation looks like:
 
+# Bash/Zsh
 source <(tome init sc ~/my_script_dir $0)
+
+# Fish
+tome init sc ~/my_script_dir $0 | source
 
 The positional arguments are:
 
@@ -39,7 +43,7 @@ macro_rules! bash_zsh_init_body {
     () => {
         r#"
 if [[ -n ${{ZSH_VERSION-}} ]]; then
-    # bash completion emulation requires that zsh's  completion has
+    # bash completion emulation requires that zsh's completion has
     # already been initialized. In addition, running the autoload
     # expression with the ampersands seems to always result in
     # compinit being executed, which clear completions that were
