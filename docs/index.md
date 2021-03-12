@@ -84,6 +84,12 @@ to be named "my-commands" you'd put the following in your .bashrc or .zshrc:
 eval "`~/bin/tome init my-commands ~/my-scripts $0`"
 ```
 
+For fish shell:
+```
+# in ~/.config/fish/conf.d/tome.fish
+tome init sc ~/my_script_dir $0 | source
+```
+
 *NOTE*: make sure to include the double quotes with the nested backticks. This ensures that newlines are captured
 and evaluated appropriately.
 
