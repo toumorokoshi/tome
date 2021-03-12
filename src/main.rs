@@ -1,4 +1,4 @@
-use std::{env::args, fs, path::PathBuf};
+use std::{env::args, fs, io, path::PathBuf};
 
 mod commands;
 mod directory;
@@ -96,10 +96,15 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
         TargetType::Directory => match command_type {
             CommandType::Completion => {
                 let mut result = vec![];
-                let mut paths: Vec<_> = fs::read_dir(target.to_str().unwrap_or(""))
-                    .unwrap()
-                    .map(|r| r.unwrap())
-                    .collect();
+                let paths_raw: io::Result<_> = fs::read_dir(target.to_str().unwrap_or(""));
+                // TODO(zph) deftly fix panics when this code path is triggered with empty string: ie sc dir_example bar<TAB>
+                // current implementation avoids the panic but is crude.
+                let mut paths: Vec<_> = match paths_raw {
+                    Err(_a) => return Err("Invalid argument to completion".to_string()),
+                    Ok(a) => a
+                }
+                .map(|r| r.unwrap())
+                .collect();
                 paths.sort_by_key(|f| f.path());
                 for path_buf in paths {
                     let path = path_buf.path();
