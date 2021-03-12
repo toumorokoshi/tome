@@ -1,7 +1,10 @@
 use std::{
     iter::{Iterator, Peekable},
     slice::Iter,
+    env,
+
 };
+use log::{debug};
 
 // unfortunately static strings cannot
 // be used in format, so we use a macro instaed.
@@ -12,7 +15,7 @@ error: {}
 
 An example tome init invocation looks like:
 
-source <(./tome init sc ~/my_script_dir $0)
+source <(tome init sc ~/my_script_dir $0)
 
 The positional arguments are:
 
@@ -37,11 +40,11 @@ macro_rules! bash_zsh_init_body {
     () => {
         r#"
 if [[ -n ${{ZSH_VERSION-}} ]]; then
-    # bash completion emulation requires that zsh's  completion has 
-    # already been initialized. In addition, running the autoload 
-    # expression with the ampersands seems to always result in 
+    # bash completion emulation requires that zsh's  completion has
+    # already been initialized. In addition, running the autoload
+    # expression with the ampersands seems to always result in
     # compinit being executed, which clear completions that were
-    # previously bound by tome, resulting in the inability to 
+    # previously bound by tome, resulting in the inability to
     # instantiate multiple tome command sets.
     if ! type complete > /dev/null; then
         autoload +X compinit && compinit
@@ -51,7 +54,7 @@ if [[ -n ${{ZSH_VERSION-}} ]]; then
 fi
 
 # completion is accomplished by three parts:
-# 1. passing all possible completions to execute.py
+# 1. passing all possible completions to {tome_executable}
 # 2. filtering for valid options using compgen
 # 3. appending to the valid option environment variable.
 function {function_name} {{
