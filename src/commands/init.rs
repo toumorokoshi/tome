@@ -4,6 +4,8 @@ use std::{
     env,
 
 };
+use clap::ArgMatches;
+
 
 // unfortunately static strings cannot
 // be used in format, so we use a macro instaed.
@@ -164,7 +166,7 @@ complete -c {function_name} -f -a "(__fish_tome_completion_fn {script_root} $arg
 // given the location of the tome executable, return
 // back the init script for tome.
 
-pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>) -> Result<String, String> {
+pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>, _app: ArgMatches) -> Result<String, String> {
     let function_name = match args.next() {
         Some(arg) => arg,
         None => {

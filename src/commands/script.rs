@@ -1,4 +1,4 @@
-use super::super::CommandType;
+use super::types::CommandType;
 use std::{
     env::var,
     fs::File,
