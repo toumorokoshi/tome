@@ -1,11 +1,5 @@
-use std::{
-    iter::{Iterator, Peekable},
-    slice::Iter,
-    env,
-
-};
 use clap::ArgMatches;
-
+use std::{env, iter::Peekable, slice::Iter};
 
 // unfortunately static strings cannot
 // be used in format, so we use a macro instaed.
@@ -84,7 +78,6 @@ complete -F _{function_name}_completions {function_name}
 "#
     };
 }
-
 
 macro_rules! fish_init_body {
     () => {
@@ -166,8 +159,12 @@ complete -c {function_name} -f -a "(__fish_tome_completion_fn {script_root} $arg
 // given the location of the tome executable, return
 // back the init script for tome.
 
-pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>, _app: ArgMatches) -> Result<String, String> {
-    let function_name = match args.next() {
+pub fn init(
+    tome_executable: &str,
+    mut _args: Peekable<Iter<String>>,
+    subcmd: &ArgMatches,
+) -> Result<String, String> {
+    let function_name = match subcmd.value_of("function_name") {
         Some(arg) => arg,
         None => {
             return Err(format!(
@@ -176,7 +173,7 @@ pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>, _app: ArgMa
             ))
         }
     };
-    let script_root = match args.next() {
+    let script_root = match subcmd.value_of("directory") {
         Some(arg) => arg,
         None => {
             return Err(format!(
@@ -189,20 +186,7 @@ pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>, _app: ArgMa
         Ok(val) => val,
         Err(e) => return Err(format!("Unable to fetch ENV var $SHELL with error: {}", e)),
     };
-    let shell_type = match args.next() {
-        Some(arg) => arg,
-        None => {
-            // fish shell does not pass $0 as fish, fallback to reading $SHELL
-            if shell_env.contains("fish") {
-               "fish"
-            } else {
-                return Err(format!(
-                    init_help_body!(),
-                    "function name required for init invocation"
-                ))
-            }
-        }
-    };
+    let shell_type = subcmd.value_of("shell").unwrap_or(&shell_env);
     // Bootstrapping the sc section requires two parts:
     // 1. creating the function in question
     // 2. wiring up tab completion for the function.
@@ -212,22 +196,18 @@ pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>, _app: ArgMa
     // current environment (such as cd you into a specific)
     // directory.
     match shell_type {
-        "fish" => {
-            Ok(format!(
-                fish_init_body!(),
-                tome_executable = tome_executable,
-                script_root = script_root,
-                function_name = function_name
-            ))
-        }
-        "bash" | "zsh" => {
-            Ok(format!(
-                bash_zsh_init_body!(),
-                tome_executable = tome_executable,
-                script_root = script_root,
-                function_name = function_name
-            ))
-        }
-        _ => Err(format!("Unknown shell {}. Unable to init.", shell_type))
+        "fish" => Ok(format!(
+            fish_init_body!(),
+            tome_executable = tome_executable,
+            script_root = script_root,
+            function_name = function_name
+        )),
+        "bash" | "zsh" => Ok(format!(
+            bash_zsh_init_body!(),
+            tome_executable = tome_executable,
+            script_root = script_root,
+            function_name = function_name
+        )),
+        _ => Err(format!("Unknown shell {}. Unable to init.", shell_type)),
     }
 }

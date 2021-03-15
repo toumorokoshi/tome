@@ -7,4 +7,3 @@ pub enum TargetType {
     File,
     Directory,
 }
-

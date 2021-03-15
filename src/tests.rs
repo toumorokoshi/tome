@@ -1,5 +1,6 @@
 use super::execute;
 
+const DIRECTORY: &'static str = "./example";
 const EXAMPLE_DIR: &'static str = "--directory=./example";
 
 fn _vec_str(args: Vec<&str>) -> Vec<String> {
@@ -11,8 +12,14 @@ fn _vec_str(args: Vec<&str>) -> Vec<String> {
 #[test]
 fn test_simple_script() {
     assert_eq!(
-        execute(_vec_str(vec!["tome", "exec", EXAMPLE_DIR, "--", "file_example"])),
-        Ok(format!("'{}/file_example'", EXAMPLE_DIR))
+        execute(_vec_str(vec![
+            "tome",
+            "exec",
+            EXAMPLE_DIR,
+            "--",
+            "file_example"
+        ])),
+        Ok(format!("'{}/file_example'", DIRECTORY))
     );
 }
 
@@ -34,8 +41,14 @@ fn test_simple_script_completion() {
 #[test]
 fn test_source() {
     assert_eq!(
-        execute(_vec_str(vec!["tome", "exec", EXAMPLE_DIR, "--", "source_example",])),
-        Ok(format!("'.' '{}/source_example' ''", EXAMPLE_DIR))
+        execute(_vec_str(vec![
+            "tome",
+            "exec",
+            EXAMPLE_DIR,
+            "--",
+            "source_example",
+        ])),
+        Ok(format!("'source' '{}/source_example' ''", DIRECTORY))
     );
 }
 
@@ -84,8 +97,15 @@ fn test_root_directory_completion() {
 #[test]
 fn test_script_in_directory() {
     assert_eq!(
-        execute(_vec_str(vec!["tome", "complete", EXAMPLE_DIR, "--", "dir_example", "foo"])),
-        Ok(format!("'{}/dir_example/foo'", EXAMPLE_DIR))
+        execute(_vec_str(vec![
+            "tome",
+            "complete",
+            EXAMPLE_DIR,
+            "--",
+            "dir_example",
+            "foo"
+        ])),
+        Ok(format!("'{}/dir_example/foo'", DIRECTORY))
     );
 }
 
@@ -105,7 +125,7 @@ fn test_script_in_directory_not_found() {
         ])),
         Err(format!(
             "command foo-nonexistent not found in directory {}/dir_example",
-            EXAMPLE_DIR
+            DIRECTORY
         ))
     );
 }
@@ -114,10 +134,16 @@ fn test_script_in_directory_not_found() {
 #[test]
 fn test_script_directory_argument() {
     assert_eq!(
-        execute(_vec_str(vec!["tome", "complete", EXAMPLE_DIR, "--", "dir_example",])),
+        execute(_vec_str(vec![
+            "tome",
+            "complete",
+            EXAMPLE_DIR,
+            "--",
+            "dir_example",
+        ])),
         Err(format!(
             "{}/dir_example is a directory. tab-complete to choose subcommands",
-            EXAMPLE_DIR
+            DIRECTORY
         ))
     );
 }
@@ -129,7 +155,7 @@ fn test_script_directory_argument() {
 fn test_use_arg() {
     assert_eq!(
         execute(_vec_str(vec!["tome", "exec", EXAMPLE_DIR, "--", "use-arg"])),
-        Ok(format!("'.' '{}/use-arg' ''", EXAMPLE_DIR))
+        Ok(format!("'source' '{}/use-arg' ''", DIRECTORY))
     );
 }
 
@@ -139,7 +165,7 @@ fn test_use_arg() {
 fn test_dangerous_characters_quoted() {
     assert_eq!(
         execute(_vec_str(vec!["tome", "exec", EXAMPLE_DIR, "--", "use-arg"])),
-        Ok(format!("'.' '{}/use-arg' ''", EXAMPLE_DIR))
+        Ok(format!("'source' '{}/use-arg' ''", DIRECTORY))
     );
 }
 

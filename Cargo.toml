@@ -7,5 +7,7 @@ license = "MIT"
 
 [dependencies]
 clap = "3.0.0-beta.2"
+log = "*"
+env_logger = "*"
 
 [dev-dependencies]

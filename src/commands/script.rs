@@ -55,7 +55,7 @@ impl Script {
                     help_string.push_str(rest);
                 }
             } else if line.starts_with("# SOURCE") {
-                    should_source = true;
+                should_source = true;
             } else if line.starts_with("# START HELP") {
                 consuming_help = true;
             } else if line.starts_with("# SUMMARY: ") {
@@ -113,7 +113,7 @@ impl Script {
             CommandType::Execute => {
                 let command_string = if self.should_source {
                     // when sourcing, just return the full body.
-                    let mut command = vec![String::from("."), self.path.clone()];
+                    let mut command = vec![String::from("source"), self.path.clone()];
                     for arg in args.iter() {
                         command.push((**arg).clone());
                     }
@@ -130,12 +130,17 @@ impl Script {
                 // after figuring out the command, all resolved values
                 // should be quoted, to ensure that the shell does not
                 // interpret character sequences.
+                // TODO: use shell escape library
                 let mut escaped_command_string = vec![];
                 for mut arg in command_string {
                     arg = arg.replace("'", "\\'");
                     arg.insert(0, '\'');
                     arg.push('\'');
                     escaped_command_string.push(arg);
+                }
+                // Include commandline arguments
+                for a in args {
+                    escaped_command_string.push(a.to_string())
                 }
                 Ok(escaped_command_string.join(" "))
             }
