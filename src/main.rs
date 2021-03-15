@@ -37,17 +37,17 @@ fn config() -> App<'static> {
                 )
                 .arg(
                     Arg::new("shell")
-                        .index(2)
+                        .index(3)
                         .about("Shell for init")
                         .required(true),
                 )
                 .arg(
                     Arg::new("directory")
-                        .short('d')
-                        .long("directory")
+                        .index(2)
                         .about("Directory of scripts")
                         .takes_value(true)
-                        .required(true),
+                        .required(true)
+                        .value_hint(clap::ValueHint::DirPath),
                 ),
         )
         .subcommand(
@@ -58,7 +58,8 @@ fn config() -> App<'static> {
                         .long("directory")
                         .about("Directory of scripts")
                         .takes_value(true)
-                        .required(true),
+                        .required(true)
+                        .value_hint(clap::ValueHint::DirPath),
                 )
                 .arg(Arg::new("files_or_directory").multiple(true)),
         )
@@ -70,9 +71,13 @@ fn config() -> App<'static> {
                         .long("directory")
                         .about("Directory of scripts")
                         .takes_value(true)
-                        .required(true),
+                        .required(true)
+                        .value_hint(clap::ValueHint::DirPath),
                 )
-                .arg(Arg::new("files_or_directory").multiple(true)),
+                .arg(Arg::new("files_or_directory")
+                    .multiple(true)
+                    .value_hint(clap::ValueHint::AnyPath)
+                ),
         );
 }
 
