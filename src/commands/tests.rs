@@ -42,7 +42,7 @@ fn test_help() {
     ",
         )) as Box<dyn Read>,
     );
-    assert_eq!(&script.help_string, "foo bar baz\n");
+    assert_eq!(&script.help_string, "foo bar baz");
 }
 
 #[test]

@@ -22,6 +22,8 @@ pub struct Script {
     /// the string that should be used for
     /// usage information
     pub summary_string: String,
+    /// shebang line
+    pub shebang: String,
 }
 
 impl Script {
@@ -36,6 +38,8 @@ impl Script {
         let mut summary_string = String::new();
         let mut line = String::new();
         let mut consuming_help = false;
+        let mut shebang = String::new();
+        // TODO: support scripts using prefix other than '#'
         loop {
             line.clear();
             match buffer.read_line(&mut line) {
@@ -46,24 +50,28 @@ impl Script {
                 }
                 Err(_) => break,
             }
+            // Remove trailing whitespace
+            line = line.trim_end().to_string();
             if consuming_help {
-                if line.starts_with("# END HELP") {
+                if line.contains("END HELP") {
                     consuming_help = false;
-                } else if let Some(rest) = line.strip_prefix("# ") {
+                } else if line.contains("# ") {
                     // omit first two characters since they are
                     // signifying continued help.
-                    help_string.push_str(rest);
+                    help_string.push_str(&line[2..line.len()]);
                 }
-            } else if line.starts_with("# SOURCE") {
+            } else if line.contains("SOURCE") {
                 should_source = true;
-            } else if line.starts_with("# START HELP") {
+            } else if line.contains("START HELP") {
                 consuming_help = true;
-            } else if line.starts_with("# SUMMARY: ") {
-                // 9 = prefix, -1 strips newline
-                summary_string.push_str(&line[11..(line.len() - 1)]);
-            } else if !line.starts_with("#!") {
+            } else if line.contains("SUMMARY: ") {
+                let s: Vec<&str> = line.splitn(2, "SUMMARY: ").collect();
+                summary_string.push_str(&s[s.len() - 1]);
+            } else if line.starts_with("#!") {
                 // if a shebang is encountered, we skip.
                 // as it can indicate the command to run the script with.
+                shebang.push_str(&line);
+            } else {
                 // metadata lines must be consecutive.
                 break;
             }
@@ -73,6 +81,7 @@ impl Script {
             should_source,
             help_string,
             summary_string,
+            shebang,
         }
     }
 
