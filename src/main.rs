@@ -51,6 +51,29 @@ fn config() -> App<'static> {
                 ),
         )
         .subcommand(
+            App::new("init_v2")
+                .arg(
+                    Arg::new("function_name")
+                        .index(1)
+                        .about("Function name")
+                        .required(true),
+                )
+                .arg(
+                    Arg::new("shell")
+                        .index(3)
+                        .about("Shell for init")
+                        .required(true),
+                )
+                .arg(
+                    Arg::new("directory")
+                        .index(2)
+                        .about("Directory of scripts")
+                        .takes_value(true)
+                        .required(true)
+                        .value_hint(clap::ValueHint::DirPath),
+                ),
+        )
+        .subcommand(
             App::new("exec")
                 .arg(
                     Arg::new("directory")
@@ -101,6 +124,10 @@ pub fn execute(args: Vec<String>) -> Result<String, String> {
     match app.subcommand() {
         Some(("init", sub_m)) => {
             return commands::init(tome.to_str().unwrap(), args.iter().peekable(), sub_m);
+        }
+        Some(("init_v2", sub_m)) => {
+            commands::init_v2(tome_s, config(), sub_m);
+            return Ok("".to_string());
         }
         Some(("exec", sub_m)) => {
             log::debug!("Subcommand: {:#?}", sub_m);

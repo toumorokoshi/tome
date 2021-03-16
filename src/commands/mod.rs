@@ -12,6 +12,7 @@ pub use self::complete::complete;
 pub use self::execute::execute;
 pub use self::help::help;
 pub use self::init::init;
+pub use self::init::init_v2;
 pub use self::script::Script;
 pub use self::types::{CommandType, TargetType};
 

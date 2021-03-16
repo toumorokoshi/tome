@@ -18,13 +18,6 @@ pub fn complete(config: Config) -> Result<String, String> {
     // that match a directory or file.
     let mut target_type = TargetType::Directory;
     let command_type = CommandType::Completion;
-    // if no argument is passed, return help.
-    if arguments.peek().is_none() {
-        match help(target.to_str().unwrap_or_default(), arguments) {
-            Ok(message) => return Ok(message),
-            Err(io_error) => return Err(format!("{}", io_error)),
-        }
-    }
     while let Some(arg) = arguments.peek() {
         target.push(arg);
         if target.is_file() {
