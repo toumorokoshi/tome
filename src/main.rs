@@ -1,6 +1,6 @@
 use clap;
 use clap::{App, Arg, ArgMatches};
-use std::{env, env::args, path::PathBuf};
+use std::{env, env::args};
 
 mod commands;
 mod directory;
@@ -9,10 +9,10 @@ mod script;
 mod tests;
 
 fn config() -> App<'static> {
-    return App::new("Tome")
+    return App::new(clap::crate_name!())
         .version(clap::crate_version!())
         .author(clap::crate_authors!())
-        .about("Modern implementation of sub")
+        .about(clap::crate_description!())
         .arg(
             Arg::new("help")
                 .short('h')
@@ -85,8 +85,8 @@ pub fn main() {
     env_logger::init();
     let args: Vec<String> = args().peekable().collect();
     match execute(args) {
-        Ok(result) => print!("{}", result),
-        Err(error_message) => print!("echo {}", error_message),
+        Ok(result) => println!("{}", result),
+        Err(error_message) => eprintln!("{}", error_message),
     }
 }
 
@@ -94,17 +94,14 @@ pub fn execute(args: Vec<String>) -> Result<String, String> {
     let application = config();
     let app = application.get_matches_from(args.clone());
 
-    let tome_executable = match args.first() {
-        Some(arg) => arg,
-        None => "",
-    };
-    let tome = PathBuf::from(tome_executable).canonicalize().unwrap();
+    let tome = std::env::current_exe().unwrap().canonicalize().unwrap();
+    log::debug!("Executable: tome: {:#?}", tome);
     let tome_s = tome.clone().to_str().unwrap().to_string();
 
     match app.subcommand() {
         Some(("init", sub_m)) => {
             return commands::init(tome.to_str().unwrap(), args.iter().peekable(), sub_m);
-        } // clone was used
+        }
         Some(("exec", sub_m)) => {
             log::debug!("Subcommand: {:#?}", sub_m);
             let config = commands::Config {
@@ -128,7 +125,6 @@ pub fn execute(args: Vec<String>) -> Result<String, String> {
         _ => {
             config().print_help().unwrap_or_default();
             return Ok("".to_string());
-            // TODO: return commands::help?
         }
     };
 }

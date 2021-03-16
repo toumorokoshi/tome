@@ -26,23 +26,24 @@ pub fn complete(config: Config) -> Result<String, String> {
         }
     }
     while let Some(arg) = arguments.peek() {
+        target.push(arg);
         if target.is_file() {
-            target.push(arg);
             target_type = TargetType::File;
             arguments.next();
             break;
         } else if target.is_dir() {
-            target.push(arg);
             target_type = TargetType::Directory;
             arguments.next();
         } else {
             // the current argument does not match
             // a directory or a file, so we've landed
             // on the strictest match.
+            target.pop();
             break;
         }
     }
     let remaining_args: Vec<_> = arguments.collect();
+    log::debug!("Remaining args: {:#?}", remaining_args);
     let output: String = match target_type {
         TargetType::Directory => {
             let mut result = vec![];
