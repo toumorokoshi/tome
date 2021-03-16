@@ -55,7 +55,7 @@ impl Script {
             if consuming_help {
                 if line.contains("END HELP") {
                     consuming_help = false;
-                } else if line.contains("# ") {
+                } else if line.contains("# ") || line.contains("// ") {
                     // omit first two characters since they are
                     // signifying continued help.
                     help_string.push_str(&line[2..line.len()]);
