@@ -1,12 +1,7 @@
 use super::super::directory;
 use super::super::script;
 use super::{CommandType, Config, Script, TargetType};
-use std::{
-    fs,
-    io,
-    iter::Iterator,
-    path::PathBuf,
-};
+use std::{fs, io, iter::Iterator, path::PathBuf};
 
 pub fn complete(config: Config) -> Result<String, String> {
     let mut arguments = config.paths.iter().peekable();

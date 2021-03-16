@@ -16,11 +16,7 @@ pub fn help(root: &str, mut _args: Peekable<Iter<String>>) -> io::Result<String>
     let mut commands_with_help = vec![];
     // TODO: restrict scan directory to reject hidden files starting with `.`
     for (command, script) in scan_directory(root, &mut vec![])? {
-        commands_with_help.push(format!(
-            "    {}: {}",
-            &command,
-            &script.summary_string
-        ))
+        commands_with_help.push(format!("    {}: {}", &command, &script.summary_string))
     }
     Ok(format!(
         help_template!(),

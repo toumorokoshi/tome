@@ -96,9 +96,10 @@ fn config() -> App<'static> {
                         .required(true)
                         .value_hint(clap::ValueHint::DirPath),
                 )
-                .arg(Arg::new("files_or_directory")
-                    .multiple(true)
-                    .value_hint(clap::ValueHint::AnyPath)
+                .arg(
+                    Arg::new("files_or_directory")
+                        .multiple(true)
+                        .value_hint(clap::ValueHint::AnyPath),
                 ),
         );
 }
@@ -124,9 +125,7 @@ pub fn execute(args: Vec<String>) -> Result<String, String> {
         Some(("init", sub_m)) => {
             commands::init(tome.to_str().unwrap(), args.iter().peekable(), sub_m)
         }
-        Some(("init_v2", sub_m)) => {
-            commands::init_v2(tome_s, config(), sub_m)
-        }
+        Some(("init_v2", sub_m)) => commands::init_v2(tome_s, config(), sub_m),
         Some(("exec", sub_m)) => {
             log::debug!("Subcommand: {:#?}", sub_m);
             let config = commands::Config {

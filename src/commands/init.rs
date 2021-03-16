@@ -1,6 +1,6 @@
 use clap::{App, ArgMatches};
-use std::{env, iter::Peekable, slice::Iter};
 use clap_generate::{generate, generators::*};
+use std::{env, iter::Peekable, slice::Iter};
 
 // unfortunately static strings cannot
 // be used in format, so we use a macro instaed.
@@ -159,7 +159,7 @@ complete -c {function_name} -f -a "(__fish_tome_completion_fn {script_root} $arg
 
 macro_rules! fish_init_body_v2_suffix {
     () => {
-    r#"
+        r#"
 complete -c tome -n "__fish_seen_subcommand_from exec" -f -a "(__fish_tome_completion)"
 function __fish_tome_completion_private
   # tome complete -d ./directory COMPLETIONPREFIX
@@ -181,7 +181,7 @@ end
 
 complete -c {tome_executable} -f -a "(__fish_tome_completion)"
 "#
-};
+    };
 }
 
 // given the location of the tome executable, return
@@ -237,7 +237,11 @@ pub fn init(
     }
 }
 
-pub fn init_v2(_tome_executable: String, mut application: App, subcmd: &ArgMatches) -> Result<String, String> {
+pub fn init_v2(
+    _tome_executable: String,
+    mut application: App,
+    subcmd: &ArgMatches,
+) -> Result<String, String> {
     // TODO: determine if we should really reference only tome or tome and the subcommand?
     let tome_executable = "tome";
     let shell_env = env::var("SHELL").unwrap();
@@ -248,7 +252,7 @@ pub fn init_v2(_tome_executable: String, mut application: App, subcmd: &ArgMatch
             let mut buffer = Vec::new();
             generate::<Bash, _>(&mut application, tome_executable, &mut buffer);
             return Ok(String::from_utf8(buffer).unwrap());
-    }
+        }
         "zsh" => {
             let mut buffer = Vec::new();
             generate::<Zsh, _>(&mut application, tome_executable, &mut buffer);
@@ -257,12 +261,15 @@ pub fn init_v2(_tome_executable: String, mut application: App, subcmd: &ArgMatch
         "fish" => {
             let mut buffer = Vec::new();
             generate::<Fish, _>(&mut application, tome_executable, &mut buffer);
-            let f = format!(fish_init_body_v2_suffix!(), tome_executable = tome_executable);
+            let f = format!(
+                fish_init_body_v2_suffix!(),
+                tome_executable = tome_executable
+            );
             buffer.append(&mut f.as_bytes().to_vec());
             return Ok(String::from_utf8(buffer).unwrap());
             // TODO: add the custom functions and completions. So far it's only for tome main executable.
-        },
-        _ => ()
+        }
+        _ => (),
     }
     Ok("".to_string())
 }
