@@ -1,7 +1,6 @@
 use clap::{App, ArgMatches};
 use std::{env, iter::Peekable, slice::Iter};
 use clap_generate::{generate, generators::*};
-use std::io;
 
 // unfortunately static strings cannot
 // be used in format, so we use a macro instaed.
@@ -238,25 +237,36 @@ pub fn init(
     }
 }
 
-pub fn init_v2(mut tome_executable: String, mut application: App, subcmd: &ArgMatches) -> () {
+pub fn init_v2(_tome_executable: String, mut application: App, subcmd: &ArgMatches) -> Result<String, String> {
     // TODO: determine if we should really reference only tome or tome and the subcommand?
     let tome_executable = "tome";
     let shell_env = env::var("SHELL").unwrap();
     let shell = get_shell(subcmd, &shell_env);
     // TODO generate all of these in a build step and output to folder and then embed in binary
     match shell {
-        "bash" => generate::<Bash, _>(&mut application, tome_executable, &mut io::stdout()),
-        "zsh" => generate::<Zsh, _>(&mut application, tome_executable, &mut io::stdout()),
+        "bash" => {
+            let mut buffer = Vec::new();
+            generate::<Bash, _>(&mut application, tome_executable, &mut buffer);
+            return Ok(String::from_utf8(buffer).unwrap());
+    }
+        "zsh" => {
+            let mut buffer = Vec::new();
+            generate::<Zsh, _>(&mut application, tome_executable, &mut buffer);
+            return Ok(String::from_utf8(buffer).unwrap());
+        }
         "fish" => {
-            generate::<Fish, _>(&mut application, tome_executable, &mut io::stdout());
-            print!("{}", format!(fish_init_body_v2_suffix!(), tome_executable = tome_executable));
+            let mut buffer = Vec::new();
+            generate::<Fish, _>(&mut application, tome_executable, &mut buffer);
+            let f = format!(fish_init_body_v2_suffix!(), tome_executable = tome_executable);
+            buffer.append(&mut f.as_bytes().to_vec());
+            return Ok(String::from_utf8(buffer).unwrap());
             // TODO: add the custom functions and completions. So far it's only for tome main executable.
         },
         _ => ()
     }
+    Ok("".to_string())
 }
 
 fn get_shell<'a>(subcmd: &'a ArgMatches, shell_env: &'a str) -> &'a str {
-    let result = subcmd.value_of("shell").unwrap_or(&shell_env.clone());
-    return result;
+    subcmd.value_of("shell").unwrap_or(&shell_env)
 }

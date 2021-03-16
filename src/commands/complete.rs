@@ -1,12 +1,10 @@
 use super::super::directory;
 use super::super::script;
-use super::{help, CommandType, Config, Script, TargetType};
+use super::{CommandType, Config, Script, TargetType};
 use std::{
     fs,
     io,
     iter::Iterator,
-    //iter::Peekable,
-    //slice::Iter,
     path::PathBuf,
 };
 

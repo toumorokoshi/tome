@@ -1,4 +1,3 @@
-use clap;
 use clap::{App, Arg, ArgMatches};
 use std::{env, env::args};
 
@@ -119,15 +118,14 @@ pub fn execute(args: Vec<String>) -> Result<String, String> {
 
     let tome = std::env::current_exe().unwrap().canonicalize().unwrap();
     log::debug!("Executable: tome: {:#?}", tome);
-    let tome_s = tome.clone().to_str().unwrap().to_string();
+    let tome_s = tome.to_str().unwrap().to_string();
 
     match app.subcommand() {
         Some(("init", sub_m)) => {
-            return commands::init(tome.to_str().unwrap(), args.iter().peekable(), sub_m);
+            commands::init(tome.to_str().unwrap(), args.iter().peekable(), sub_m)
         }
         Some(("init_v2", sub_m)) => {
-            commands::init_v2(tome_s, config(), sub_m);
-            return Ok("".to_string());
+            commands::init_v2(tome_s, config(), sub_m)
         }
         Some(("exec", sub_m)) => {
             log::debug!("Subcommand: {:#?}", sub_m);
@@ -137,7 +135,7 @@ pub fn execute(args: Vec<String>) -> Result<String, String> {
                 directory: sub_m.value_of("directory").unwrap().to_string(),
                 paths: extract_positionals(sub_m, "files_or_directory"),
             };
-            return commands::execute(config);
+            commands::execute(config)
         }
         Some(("complete", sub_m)) => {
             log::debug!("Subcommand: {:#?}", sub_m);
@@ -147,15 +145,16 @@ pub fn execute(args: Vec<String>) -> Result<String, String> {
                 directory: sub_m.value_of("directory").unwrap().to_string(),
                 paths: extract_positionals(sub_m, "files_or_directory"),
             };
-            return commands::complete(config);
+            commands::complete(config)
         }
         _ => {
+            // TODO: rework this to capture stdout
             config().print_help().unwrap_or_default();
-            return Ok("".to_string());
+            Ok("".to_string())
         }
-    };
+    }
 }
 
 fn extract_positionals(app: &ArgMatches, name: &str) -> Vec<String> {
-    app.values_of_t(&name).unwrap_or(Vec::new())
+    app.values_of_t(&name).unwrap_or_default()
 }
