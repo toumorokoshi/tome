@@ -39,7 +39,6 @@ impl Script {
         let mut line = String::new();
         let mut consuming_help = false;
         let mut shebang = String::new();
-        // TODO: support scripts using prefix other than '#'
         loop {
             line.clear();
             match buffer.read_line(&mut line) {

@@ -27,7 +27,21 @@ fn config() -> App<'static> {
                 .about("Sets the level of verbosity"),
         )
         .subcommand(
+            App::new("commands")
+                .about("List available scripts")
+            .arg(
+                Arg::new("directory")
+                    .short('d')
+                    .long("directory")
+                    .about("Directory of scripts")
+                    .takes_value(true)
+                    .required(true)
+                    .value_hint(clap::ValueHint::DirPath),
+            ),
+        )
+        .subcommand(
             App::new("init")
+                .about("Print shell completion")
                 .arg(
                     Arg::new("function_name")
                         .index(1)
@@ -51,6 +65,7 @@ fn config() -> App<'static> {
         )
         .subcommand(
             App::new("init_v2")
+                .about("Print shell completion")
                 .arg(
                     Arg::new("function_name")
                         .index(1)
@@ -74,6 +89,7 @@ fn config() -> App<'static> {
         )
         .subcommand(
             App::new("exec")
+                .about("Excute script")
                 .arg(
                     Arg::new("directory")
                         .short('d')
@@ -87,6 +103,7 @@ fn config() -> App<'static> {
         )
         .subcommand(
             App::new("complete")
+                .about("Output commandline autocompletion results")
                 .arg(
                     Arg::new("directory")
                         .short('d')
@@ -126,6 +143,11 @@ pub fn execute(args: Vec<String>) -> Result<String, String> {
             commands::init(tome.to_str().unwrap(), args.iter().peekable(), sub_m)
         }
         Some(("init_v2", sub_m)) => commands::init_v2(tome_s, config(), sub_m),
+        Some(("commands", sub_m)) => {
+            // Unwrap/rewrap here due to lack of familiarity with Rust types for Result
+            // ie converting io::Result<String> -> Result<String, String>
+            Ok(commands::help(sub_m.value_of("directory").unwrap()).unwrap())
+        }
         Some(("exec", sub_m)) => {
             log::debug!("Subcommand: {:#?}", sub_m);
             let config = commands::Config {

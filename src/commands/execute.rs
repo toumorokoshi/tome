@@ -1,10 +1,5 @@
 use super::{help, CommandType, Config, Script, TargetType};
-use std::{
-    iter::Iterator,
-    //iter::Peekable,
-    //slice::Iter,
-    path::PathBuf,
-};
+use std::{iter::Iterator, path::PathBuf};
 
 pub fn execute(config: Config) -> Result<String, String> {
     let mut arguments = config.paths.iter().peekable();
@@ -16,7 +11,7 @@ pub fn execute(config: Config) -> Result<String, String> {
     let command_type = CommandType::Execute;
     // if no argument is passed, return help.
     if arguments.peek().is_none() {
-        match help(target.to_str().unwrap_or_default(), arguments) {
+        match help(target.to_str().unwrap_or_default()) {
             Ok(message) => return Ok(message),
             Err(io_error) => return Err(format!("{}", io_error)),
         }
