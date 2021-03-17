@@ -7,7 +7,7 @@ license = "MIT"
 
 [dependencies]
 clap = "3.0.0-beta.2"
-clap_generate = { repo = "https://github.com/clap-rs/clap/tree/master/clap_generate" }
+clap_generate = "3.0.0-beta.2"
 log = "*"
 env_logger = "*"
 
