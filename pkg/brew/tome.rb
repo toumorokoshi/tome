@@ -4,7 +4,6 @@ class Tome < Formula
   desc "Modern replacement for 'sub'"
   homepage HOMEPAGE
   url HOMEPAGE
-  # TODO: What's correct license?
   license "MIT"
   version '0.1.0'
   revision 1

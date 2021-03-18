@@ -3,6 +3,7 @@ name = "tome"
 version = "0.1.0"
 authors = ["Yusuke Tsutsumi <yusuke@tsutsumi.io>"]
 edition = "2018"
+license = "MIT"
 
 [dependencies]
 tui = "0.3.0"
