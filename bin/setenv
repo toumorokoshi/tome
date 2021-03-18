@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# USAGE: ./bin/setenv
+# SUMMARY: Set env outputs the correct environmental variables to cross compile to
+# linux and darwin from either a build platform of linux or darwin.
+# Run this script before trying to do cross compilation.
+# Credit: http://timryan.org/2018/07/27/cross-compiling-linux-binaries-from-macos.html
+
+set -eou pipefail
+
+# Build platform
+OS="$(uname -a | awk '{print tolower($1)}')"
+
+case "$OS" in
+  "darwin")
+    echo export CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER="x86_64-linux-musl-gcc"
+    ;;
+  "linux")
+    echo export CARGO_TARGET_X86_64_APPLE_DARWIN_LINKER="x86_64-apple-darwin15-clang"
+    echo export CARGO_TARGET_X86_64_APPLE_DARWIN_AR="x86_64-apple-darwin15-ar"
+    ;;
+  *)
+    echo -e "Unknown build platform, only darwin and linux are supported"
+    exit 1
+    ;;
+esac
