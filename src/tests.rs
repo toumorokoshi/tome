@@ -38,20 +38,6 @@ fn test_source() {
     );
 }
 
-#[test]
-#[ignore]
-fn test_source_completion() {
-    assert_eq!(
-        execute(_vec_str(vec![
-            "tome",
-            EXAMPLE_DIR,
-            "--complete",
-            "source_example",
-        ])),
-        Ok(String::from("foo baz\n"))
-    );
-}
-
 /// if completion is requested on a directory,
 /// return the list of file and directories in there.
 #[test]
