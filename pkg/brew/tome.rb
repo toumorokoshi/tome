@@ -1,12 +1,13 @@
 class Tome < Formula
-  HOMEPAGE = "https://github.com/zph/tome"
+  HOMEPAGE = "https://github.com/toumorokoshi/tome"
 
   desc "Modern replacement for 'sub'"
   homepage HOMEPAGE
   url HOMEPAGE
+  # TODO: What's correct license?
   license "MIT"
-  revision 2
   version '0.1.0'
+  revision 1
 
   head "#{HOMEPAGE}.git"
 
@@ -14,13 +15,10 @@ class Tome < Formula
 
   def install
     system "cargo", "install", *std_cargo_args
-
-    #   bash_completion.install "completions/completions.bash" => "exa"
-    #   zsh_completion.install  "completions/completions.zsh"  => "_exa"
-    #   fish_completion.install "completions/completions.fish" => "exa.fish"
   end
 
   test do
+    # TODO: setup testing
     # (testpath/"test.txt").write("")
     # assert_match "test.txt", shell_output("#{bin}/exa")
   end
