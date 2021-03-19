@@ -1,8 +1,7 @@
 use std::{
+    env,
     iter::{Iterator, Peekable},
     slice::Iter,
-    env,
-
 };
 
 // unfortunately static strings cannot
@@ -82,7 +81,6 @@ complete -F _{function_name}_completions {function_name}
 "#
     };
 }
-
 
 macro_rules! fish_init_body {
     () => {
@@ -192,12 +190,12 @@ pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>) -> Result<S
         None => {
             // fish shell does not pass $0 as fish, fallback to reading $SHELL
             if shell_env.contains("fish") {
-               "fish"
+                "fish"
             } else {
                 return Err(format!(
                     init_help_body!(),
                     "function name required for init invocation"
-                ))
+                ));
             }
         }
     };
@@ -210,22 +208,18 @@ pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>) -> Result<S
     // current environment (such as cd you into a specific)
     // directory.
     match shell_type {
-        "fish" => {
-            Ok(format!(
-                fish_init_body!(),
-                tome_executable = tome_executable,
-                script_root = script_root,
-                function_name = function_name
-            ))
-        }
-        "bash" | "zsh" => {
-            Ok(format!(
-                bash_zsh_init_body!(),
-                tome_executable = tome_executable,
-                script_root = script_root,
-                function_name = function_name
-            ))
-        }
-        _ => Err(format!("Unknown shell {}. Unable to init.", shell_type))
+        "fish" => Ok(format!(
+            fish_init_body!(),
+            tome_executable = tome_executable,
+            script_root = script_root,
+            function_name = function_name
+        )),
+        "bash" | "zsh" => Ok(format!(
+            bash_zsh_init_body!(),
+            tome_executable = tome_executable,
+            script_root = script_root,
+            function_name = function_name
+        )),
+        _ => Err(format!("Unknown shell {}. Unable to init.", shell_type)),
     }
 }

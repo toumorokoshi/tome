@@ -101,7 +101,7 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
                 // current implementation avoids the panic but is crude.
                 let mut paths: Vec<_> = match paths_raw {
                     Err(_a) => return Err("Invalid argument to completion".to_string()),
-                    Ok(a) => a
+                    Ok(a) => a,
                 }
                 .map(|r| r.unwrap())
                 .collect();

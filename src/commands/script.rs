@@ -55,7 +55,7 @@ impl Script {
                     help_string.push_str(rest);
                 }
             } else if line.starts_with("# SOURCE") {
-                    should_source = true;
+                should_source = true;
             } else if line.starts_with("# START HELP") {
                 consuming_help = true;
             } else if line.starts_with("# SUMMARY: ") {
