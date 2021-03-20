@@ -39,7 +39,6 @@ fn test_source() {
 }
 
 #[test]
-#[ignore]
 fn test_source_completion() {
     assert_eq!(
         execute(_vec_str(vec![
