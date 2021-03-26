@@ -179,7 +179,23 @@ function __fish_tome_completion
   end
 end
 
+function __fish_tome_completion_fn
+  set -l dir $argv[1]
+  set -l cmdline (commandline -co)
+  # Drop function name
+  set -l cmd $cmdline[2..-1]
+  set -l args "{tome_executable}" "complete" --directory $dir $cmd
+  __fish_tome_completion_private $args
+end
+
 complete -c {tome_executable} -f -a "(__fish_tome_completion)"
+
+# Alias for tome command
+function {function_name}
+  eval ({tome_executable} exec --directory {script_root} -- $argv)
+end
+complete -c {function_name} -f -a "(__fish_tome_completion_fn {script_root} $argv)"
+# End tome alias
 "#
     };
 }
@@ -246,6 +262,24 @@ pub fn init_v2(
     let tome_executable = "tome";
     let shell_env = env::var("SHELL").unwrap();
     let shell = get_shell(subcmd, &shell_env);
+    let script_root = match subcmd.value_of("directory") {
+        Some(arg) => arg,
+        None => {
+            return Err(format!(
+                init_help_body!(),
+                "function name required for init invocation"
+            ))
+        }
+    };
+    let function_name = match subcmd.value_of("function_name") {
+        Some(arg) => arg,
+        None => {
+            return Err(format!(
+                init_help_body!(),
+                "function name required for init invocation"
+            ))
+        }
+    };
     // TODO generate all of these in a build step and output to folder and then embed in binary
     match shell {
         "bash" => {
@@ -263,7 +297,9 @@ pub fn init_v2(
             generate::<Fish, _>(&mut application, tome_executable, &mut buffer);
             let f = format!(
                 fish_init_body_v2_suffix!(),
-                tome_executable = tome_executable
+                tome_executable = tome_executable,
+                script_root = script_root,
+                function_name = function_name
             );
             buffer.append(&mut f.as_bytes().to_vec());
             return Ok(String::from_utf8(buffer).unwrap());
