@@ -199,6 +199,12 @@ pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>) -> Result<S
             }
         }
     };
+
+    let body = match shell_type {
+        "fish" => fish_init_body!(),
+        "bash" | "zsh" => bash_zsh_init_body!(),
+        _ => "",
+    };
     // Bootstrapping the sc section requires two parts:
     // 1. creating the function in question
     // 2. wiring up tab completion for the function.
@@ -207,19 +213,11 @@ pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>) -> Result<S
     // tome also supports commands that modify the
     // current environment (such as cd you into a specific)
     // directory.
-    match shell_type {
-        "fish" => Ok(format!(
-            fish_init_body!(),
-            tome_executable = tome_executable,
-            script_root = script_root,
-            function_name = function_name
-        )),
-        "bash" | "zsh" => Ok(format!(
-            bash_zsh_init_body!(),
-            tome_executable = tome_executable,
-            script_root = script_root,
-            function_name = function_name
-        )),
-        _ => Err(format!("Unknown shell {}. Unable to init.", shell_type)),
-    }
+    Ok(format!(
+        "{} {} {} {}",
+        body,
+        tome_executable = tome_executable,
+        script_root = script_root,
+        function_name = function_name
+    ))
 }
