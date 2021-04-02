@@ -15,10 +15,4 @@ class Tome < Formula
   def install
     system "cargo", "install", *std_cargo_args
   end
-
-  test do
-    # TODO: setup testing
-    # (testpath/"test.txt").write("")
-    # assert_match "test.txt", shell_output("#{bin}/exa")
-  end
 end
