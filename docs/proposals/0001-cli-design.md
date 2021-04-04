@@ -1,0 +1,49 @@
+# CLI design
+
+authors: @toumorokoshi, @zph
+
+
+This proposal outlines the design decisions and considerations for the Tome CLI.
+
+## Background
+
+Tome was initially designed as a drop-in replacement for [sub](https://github.com/basecamp/sub), to ensure portability.
+
+## Terminology
+
+For the following discussion, `{instance}` is defined as the instantiated tome or sub command.
+
+## Design Decisions
+
+### compatibility with sub CLI instances
+
+Sub-based clis provide the following functionality with each command:
+
+- `{instance} --help`: a list of all known commands, and a description.
+- `{instance} help {subcommand}`: a help guide on the subcommand.
+
+### reserving a namespace for tome to add to instanced CLIs
+
+Since a user can name their commands after any valid filename, it is possible
+for any command that is built into the tome-based CLIs to clobber a possible command the user would like to create.
+
+For example let's assume that tome would like to introduce a top-level command known as "exec". This would look like:
+
+```
+{instance} exec
+```
+
+However, this could conflict with a user creating a file called `exec` in their instance root directory.
+
+Due to this possibility, tome cannot easily add new commands to the root, and must declare the set of reserved top-level names, or reserve none at all.
+
+However, it is valuable for time to add new commands in the CLI themselves, as tome gains more functionality. So we should provide a *pattern* for how new commands are introduced.
+
+A couple options include:
+
+- only use flags to denote subcommands. a la `{instance} --help`.
+- provide a reserved namespace in which tome can add commands. For example `{instance} tome help`.
+
+### commands available to tome itself
+
+The tome CLI is only restricted by backwards compatibility with regards to the design of the CLI. As such, we can liberally add commands to the tome CLI.
