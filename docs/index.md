@@ -1,11 +1,18 @@
 # Introduction
 
+## Quickstart
+- Download binary for platform from Releases
+- Add init command to your shell init: ie for zsh add to ~/.zshrc
+```
+eval "$(tome init my-commands ~/my-scripts zsh)"
+```
+- `my-commands --help`
+
 ## What is Tome?
 
-Tome provides easy organization
-and execution of collections of command line scripts.
+Tome provides easy organization and execution of collections of command line scripts.
 
-Basically take a directory of scripts like this:
+With a directory of scripts like this:
 
 ```
 root/
@@ -20,7 +27,7 @@ root/
       provision-my-service
 ```
 
-And be able run them like:
+Tome allows for executing them like:
 
 ```
 $ my-command go-to-workspace
@@ -35,7 +42,7 @@ And add in some features for discoverability:
 
 * tab-completion
 * search all available commands (just enter your command with no arguments)
-* TODO: help commands
+* help commands
 
 ## Why?
 
@@ -46,6 +53,9 @@ This works well for a small group, but once you're trying to share scripts acros
 * discoverability: how do I see what already exists?
 * namespacing: how do I find commands that relate to what I'm working on?
 * completion: It's nice
+
+### Prior Art & Inspiration
+https://github.com/basecamp/sub
 
 ## Getting Started
 
@@ -72,7 +82,7 @@ root/
 
 (keeping these in version control is recommended)
 
-Put them in a well known, persistent location as well (e.g. ~/my-scripts). 
+Put them in a well known, persistent location as well (e.g. ~/my-scripts).
 
 ### 3. Put The Initialization Code in your .rc file
 
@@ -81,7 +91,16 @@ to be named "my-commands" you'd put the following in your .bashrc or .zshrc:
 
 ```
 # posix example, e.g. .bashrc
-eval "`~/bin/tome init my-commands ~/my-scripts $0`"
+eval "$(tome init my-commands ~/my-scripts bash)"
+
+# zsh
+eval "$(tome init my-commands ~/my-scripts zsh)"
+```
+
+For fish shell:
+```
+# in ~/.config/fish/conf.d/tome.fish
+tome init my-commands ~/my_script_dir $0 | source
 ```
 
 *NOTE*: make sure to include the double quotes with the nested backticks. This ensures that newlines are captured
@@ -90,3 +109,7 @@ and evaluated appropriately.
 ### 4. Start a New Shell
 
 Once installed, start a new shell and you should have your new command!
+
+## Developing Tome
+
+See CONTRIBUTING.md

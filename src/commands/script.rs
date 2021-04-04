@@ -49,25 +49,23 @@ impl Script {
             if consuming_help {
                 if line.starts_with("# END HELP") {
                     consuming_help = false;
-                } else if line.starts_with("# ") {
+                } else if let Some(rest) = line.strip_prefix("# ") {
                     // omit first two characters since they are
                     // signifying continued help.
-                    help_string.push_str(&line[2..]);
+                    help_string.push_str(rest);
                 }
-            } else {
-                if line.starts_with("# SOURCE") {
-                    should_source = true;
-                } else if line.starts_with("# START HELP") {
-                    consuming_help = true;
-                } else if line.starts_with("# SUMMARY: ") {
-                    // 9 = prefix, -1 strips newline
-                    summary_string.push_str(&line[11..(line.len() - 1)]);
-                } else if !line.starts_with("#!") {
-                    // if a shebang is encountered, we skip.
-                    // as it can indicate the command to run the script with.
-                    // metadata lines must be consecutive.
-                    break;
-                }
+            } else if line.starts_with("# SOURCE") {
+                should_source = true;
+            } else if line.starts_with("# START HELP") {
+                consuming_help = true;
+            } else if line.starts_with("# SUMMARY: ") {
+                // 9 = prefix, -1 strips newline
+                summary_string.push_str(&line[11..(line.len() - 1)]);
+            } else if !line.starts_with("#!") {
+                // if a shebang is encountered, we skip.
+                // as it can indicate the command to run the script with.
+                // metadata lines must be consecutive.
+                break;
             }
         }
         Script {
@@ -83,7 +81,7 @@ impl Script {
     pub fn get_execution_body(
         &self,
         command_type: CommandType,
-        args: &Vec<&String>,
+        args: &[&String],
     ) -> Result<String, String> {
         match command_type {
             CommandType::Completion => {
@@ -139,7 +137,7 @@ impl Script {
                     arg.push('\'');
                     escaped_command_string.push(arg);
                 }
-                Ok(escaped_command_string.join(" ").to_owned())
+                Ok(escaped_command_string.join(" "))
             }
         }
     }

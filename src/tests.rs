@@ -1,4 +1,5 @@
 use super::execute;
+use std::env;
 
 const EXAMPLE_DIR: &'static str = "./example";
 
@@ -40,6 +41,12 @@ fn test_source() {
 
 #[test]
 fn test_source_completion() {
+    // Context: https://github.com/toumorokoshi/tome/issues/6
+    // Override SHELL env variable due to test depending on sourced file
+    // being a bash/zsh compatible sourced file.
+    // The behavior of sourcing scripts works in cli and we patch
+    // in tests to ensure consistent results.
+    env::set_var("SHELL", "bash");
     assert_eq!(
         execute(_vec_str(vec![
             "tome",

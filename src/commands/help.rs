@@ -21,11 +21,11 @@ pub fn help(root: &str, mut _args: Peekable<Iter<String>>) -> io::Result<String>
             escape_slashes(&script.summary_string)
         ))
     }
-    return Ok(format!(
+    Ok(format!(
         help_template!(),
         root,
         commands_with_help.join("\\n")
-    ));
+    ))
 }
 
 // escape slash characters with posix-compatible quotes. Helps if the echo

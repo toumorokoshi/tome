@@ -47,10 +47,10 @@ pub fn is_tome_script_directory(dir: &Path) -> bool {
         .unwrap_or_default()
         .to_str()
         .unwrap_or_default()
-        .starts_with(".")
+        .starts_with('.')
     {
         return false;
     }
     tomeignore_location.push(".tomeignore");
-    return !tomeignore_location.exists();
+    !tomeignore_location.exists()
 }
