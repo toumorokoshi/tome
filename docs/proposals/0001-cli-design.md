@@ -56,7 +56,7 @@ For example if a user has a user script called `help` they could execute it with
 
 #### tome
 
-It is valuable for time to add new commands in the CLI themselves, as tome gains more functionality. So we should provide a *pattern* for how new commands are introduced. To
+It is valuable for tome to add new commands in the CLI themselves, as tome gains more functionality. So we should provide a *pattern* for how new commands are introduced. To
 preserve consistency and compatibility for users, we will attempt to limit instance subcommands to the ones declared in this design document.
 
 We're choosing to pre-allocate the `{instance} tome ...` namespace for future cli expansion.
