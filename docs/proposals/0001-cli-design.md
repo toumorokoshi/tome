@@ -61,7 +61,7 @@ preserve consistency and compatibility for users, we will attempt to limit insta
 
 We're choosing to pre-allocate the `{instance} tome ...` namespace for future cli expansion.
 
-### commands available to tome itself
+### sub-commands on tome itself
 
 The tome CLI is only restricted by backwards compatibility with regards to the design of the CLI. As such, we can liberally add commands to the tome CLI.
 
