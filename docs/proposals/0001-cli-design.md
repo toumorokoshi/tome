@@ -25,16 +25,7 @@ it will not significantly hamper the ability for tome to be enhanced, or
 lead to a poor design decision (e.g. error-prone behavior).
 
 ## Design Decisions
-
-### compatibility with sub CLI instances
-
-Sub-based clis provide the following functionality with each command:
-
-- `{instance} --help`: a list of all known commands, and a description.
-- `{instance} help {subcommand}`: a help guide on the subcommand.
-
-
-### reserving a namespace for tome to add to instanced CLIs
+### reserved commands for tome to add to instanced CLIs
 
 Since a user can name their commands after any valid filename, it is possible
 for any command that is built into the tome-based CLIs to clobber a possible command the user would like to create.
@@ -45,6 +36,8 @@ As such, we are choosing to reserve the following subcommands on the `{instance}
 * `{instance} commands` to list all available user scripts
 * `{instance} exec` for executing user scripts with conflicting names as instance subcommands
 * `{instance} tome` as a future cli namespace
+
+More information about specific commands and their purpose are outlined below.
 
 #### exec
 
@@ -65,6 +58,8 @@ We're choosing to pre-allocate the `{instance} tome ...` namespace for future cl
 
 The tome CLI is only restricted by backwards compatibility with regards to the design of the CLI. As such, we can liberally add commands to the tome CLI.
 
+Note: these are not to be confused with the `{instance}` subcommands.
+
 Currently the proposal for new commands is to include:
 
 * init
@@ -73,4 +68,3 @@ Currently the proposal for new commands is to include:
 * complete
 * commands
 
-Note: these are not to be confused with the `{instance}` subcommands.
