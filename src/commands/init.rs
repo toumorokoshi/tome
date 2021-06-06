@@ -1,8 +1,6 @@
-use std::{
-    env,
-    iter::{Iterator, Peekable},
-    slice::Iter,
-};
+use clap::{App, ArgMatches};
+use clap_generate::{generate, generators::*};
+use std::{env, iter::Peekable, slice::Iter};
 
 // unfortunately static strings cannot
 // be used in format, so we use a macro instaed.
@@ -159,11 +157,58 @@ complete -c {function_name} -f -a "(__fish_tome_completion_fn {script_root} $arg
     };
 }
 
+macro_rules! fish_init_body_v2_suffix {
+    () => {
+        r#"
+complete -c tome -n "__fish_seen_subcommand_from exec" -f -a "(__fish_tome_completion)"
+function __fish_tome_completion_private
+  # tome complete -d ./directory COMPLETIONPREFIX
+  $argv[1] "complete" $argv[3] $argv[4] $argv[5..-1] | tr " " "\n"
+  return 0
+end
+
+function __fish_tome_completion
+  set -l args (commandline -co)
+  switch $args[1]
+    case 'tome'
+      __fish_tome_completion_private $args
+    case '*'
+    # function codepath
+      echo "Bad codepath"
+      exit 1
+  end
+end
+
+function __fish_tome_completion_fn
+  set -l dir $argv[1]
+  set -l cmdline (commandline -co)
+  # Drop function name
+  set -l cmd $cmdline[2..-1]
+  set -l args "{tome_executable}" "complete" --directory $dir $cmd
+  __fish_tome_completion_private $args
+end
+
+complete -c {tome_executable} -f -a "(__fish_tome_completion)"
+
+# Alias for tome command
+function {function_name}
+  eval ({tome_executable} exec --directory {script_root} -- $argv)
+end
+complete -c {function_name} -f -a "(__fish_tome_completion_fn {script_root} $argv)"
+# End tome alias
+"#
+    };
+}
+
 // given the location of the tome executable, return
 // back the init script for tome.
 
-pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>) -> Result<String, String> {
-    let function_name = match args.next() {
+pub fn init(
+    tome_executable: &str,
+    mut _args: Peekable<Iter<String>>,
+    subcmd: &ArgMatches,
+) -> Result<String, String> {
+    let function_name = match subcmd.value_of("function_name") {
         Some(arg) => arg,
         None => {
             return Err(format!(
@@ -172,7 +217,7 @@ pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>) -> Result<S
             ))
         }
     };
-    let script_root = match args.next() {
+    let script_root = match subcmd.value_of("directory") {
         Some(arg) => arg,
         None => {
             return Err(format!(
@@ -181,24 +226,8 @@ pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>) -> Result<S
             ))
         }
     };
-    let shell_env = match env::var("SHELL") {
-        Ok(val) => val,
-        Err(e) => return Err(format!("Unable to fetch ENV var $SHELL with error: {}", e)),
-    };
-    let shell_type = match args.next() {
-        Some(arg) => arg,
-        None => {
-            // fish shell does not pass $0 as fish, fallback to reading $SHELL
-            if shell_env.contains("fish") {
-                "fish"
-            } else {
-                return Err(format!(
-                    init_help_body!(),
-                    "function name required for init invocation"
-                ));
-            }
-        }
-    };
+    let shell_env = env::var("SHELL").unwrap();
+    let shell = get_shell(subcmd, &shell_env);
     // Bootstrapping the sc section requires two parts:
     // 1. creating the function in question
     // 2. wiring up tab completion for the function.
@@ -207,7 +236,7 @@ pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>) -> Result<S
     // tome also supports commands that modify the
     // current environment (such as cd you into a specific)
     // directory.
-    match shell_type {
+    match shell {
         "fish" => Ok(format!(
             fish_init_body!(),
             tome_executable = tome_executable,
@@ -220,6 +249,67 @@ pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>) -> Result<S
             script_root = script_root,
             function_name = function_name
         )),
-        _ => Err(format!("Unknown shell {}. Unable to init.", shell_type)),
+        _ => Err(format!("Unknown shell {}. Unable to init.", shell)),
     }
+}
+
+pub fn init_v2(
+    _tome_executable: String,
+    mut application: App,
+    subcmd: &ArgMatches,
+) -> Result<String, String> {
+    // TODO: determine if we should really reference only tome or tome and the subcommand?
+    let tome_executable = "tome";
+    let shell_env = env::var("SHELL").unwrap();
+    let shell = get_shell(subcmd, &shell_env);
+    let script_root = match subcmd.value_of("directory") {
+        Some(arg) => arg,
+        None => {
+            return Err(format!(
+                init_help_body!(),
+                "function name required for init invocation"
+            ))
+        }
+    };
+    let function_name = match subcmd.value_of("function_name") {
+        Some(arg) => arg,
+        None => {
+            return Err(format!(
+                init_help_body!(),
+                "function name required for init invocation"
+            ))
+        }
+    };
+    // TODO generate all of these in a build step and output to folder and then embed in binary
+    match shell {
+        "bash" => {
+            let mut buffer = Vec::new();
+            generate::<Bash, _>(&mut application, tome_executable, &mut buffer);
+            return Ok(String::from_utf8(buffer).unwrap());
+        }
+        "zsh" => {
+            let mut buffer = Vec::new();
+            generate::<Zsh, _>(&mut application, tome_executable, &mut buffer);
+            return Ok(String::from_utf8(buffer).unwrap());
+        }
+        "fish" => {
+            let mut buffer = Vec::new();
+            generate::<Fish, _>(&mut application, tome_executable, &mut buffer);
+            let f = format!(
+                fish_init_body_v2_suffix!(),
+                tome_executable = tome_executable,
+                script_root = script_root,
+                function_name = function_name
+            );
+            buffer.append(&mut f.as_bytes().to_vec());
+            return Ok(String::from_utf8(buffer).unwrap());
+            // TODO: add the custom functions and completions. So far it's only for tome main executable.
+        }
+        _ => (),
+    }
+    Ok("".to_string())
+}
+
+fn get_shell<'a>(subcmd: &'a ArgMatches, shell_env: &'a str) -> &'a str {
+    subcmd.value_of("shell").unwrap_or(&shell_env)
 }

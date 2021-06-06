@@ -1,4 +1,5 @@
-use std::{env::args, fs, io, path::PathBuf};
+use clap::{App, Arg, ArgMatches};
+use std::{env, env::args};
 
 mod commands;
 mod directory;
@@ -6,140 +7,151 @@ mod script;
 #[cfg(test)]
 mod tests;
 
+fn directory_arg() -> clap::Arg<'static> {
+    Arg::new("directory")
+        .short('d')
+        .long("directory")
+        .about("Directory of scripts")
+        .takes_value(true)
+        .required(true)
+        .value_hint(clap::ValueHint::DirPath)
+}
+
+fn files_or_directory_arg() -> clap::Arg<'static> {
+    Arg::new("files_or_directory")
+        .multiple(true)
+        .value_hint(clap::ValueHint::AnyPath)
+}
+
+fn function_name_arg() -> clap::Arg<'static> {
+    Arg::new("function_name")
+        .index(1)
+        .about("Function name")
+        .required(true)
+}
+
+fn init_directory_arg() -> clap::Arg<'static> {
+    Arg::new("directory")
+        .index(2)
+        .about("Directory of scripts")
+        .takes_value(true)
+        .required(true)
+        .value_hint(clap::ValueHint::DirPath)
+}
+
+fn shell_arg() -> clap::Arg<'static> {
+    Arg::new("shell")
+        .index(3)
+        .about("Shell for init")
+        .required(true)
+}
+
+fn config() -> App<'static> {
+    return App::new(clap::crate_name!())
+        .version(clap::crate_version!())
+        .author(clap::crate_authors!())
+        .about(clap::crate_description!())
+        .arg(
+            Arg::new("v")
+                .short('v')
+                .long("verbose")
+                .multiple(true)
+                .about("Sets the level of verbosity"),
+        )
+        .subcommand(
+            App::new("help")
+                .about("Print help information")
+            .arg(directory_arg()),
+        )
+        .subcommand(
+            App::new("tome")
+                .about("Print help information")
+            .arg(directory_arg()),
+        )
+        .subcommand(
+            App::new("commands")
+                .about("List available scripts")
+            .arg(directory_arg())
+        )
+        .subcommand(
+            App::new("init")
+                .about("Print shell completion")
+                .arg(function_name_arg())
+                .arg(init_directory_arg())
+                .arg(shell_arg()))
+        .subcommand(
+            App::new("init_v2")
+                .about("Print shell completion")
+                .arg(function_name_arg())
+                .arg(init_directory_arg())
+                .arg(shell_arg()))
+        .subcommand(
+            App::new("exec")
+                .about("Excute script")
+                .arg(directory_arg())
+                .arg(files_or_directory_arg()))
+        .subcommand(
+            App::new("complete")
+                .about("Output commandline autocompletion results")
+                .arg(directory_arg())
+                .arg(files_or_directory_arg()))
+}
+
 pub fn main() {
+    env_logger::init();
     let args: Vec<String> = args().peekable().collect();
     match execute(args) {
-        Ok(result) => print!("{}", result),
-        Err(error_message) => print!("echo {}", error_message),
-    };
+        Ok(result) => println!("{}", result),
+        Err(error_message) => eprintln!("{}", error_message),
+    }
 }
 
-pub enum CommandType {
-    Execute,
-    Completion,
+pub fn execute(args: Vec<String>) -> Result<String, String> {
+    let application = config();
+    let app = application.get_matches_from(args.clone());
+
+    let tome = std::env::current_exe().unwrap().canonicalize().unwrap();
+    log::debug!("Executable: tome: {:#?}", tome);
+    let tome_s = tome.to_str().unwrap().to_string();
+
+    match app.subcommand() {
+        Some(("init", sub_m)) => {
+            commands::init(tome.to_str().unwrap(), args.iter().peekable(), sub_m)
+        }
+        Some(("init_v2", sub_m)) => commands::init_v2(tome_s, config(), sub_m),
+        Some(("commands", sub_m)) => {
+            // Unwrap/rewrap here due to lack of familiarity with Rust types for Result
+            // ie converting io::Result<String> -> Result<String, String>
+            Ok(commands::help(sub_m.value_of("directory").unwrap()).unwrap())
+        }
+        Some(("exec", sub_m)) => {
+            log::debug!("Subcommand: {:#?}", sub_m);
+            let config = commands::Config {
+                executable: tome_s,
+                args: app.clone(),
+                directory: sub_m.value_of("directory").unwrap().to_string(),
+                paths: extract_positionals(sub_m, "files_or_directory"),
+            };
+            commands::execute(config)
+        }
+        Some(("complete", sub_m)) => {
+            log::debug!("Subcommand: {:#?}", sub_m);
+            let config = commands::Config {
+                executable: tome_s,
+                args: app.clone(),
+                directory: sub_m.value_of("directory").unwrap().to_string(),
+                paths: extract_positionals(sub_m, "files_or_directory"),
+            };
+            commands::complete(config)
+        }
+        _ => {
+            // TODO: rework this to capture stdout
+            config().print_help().unwrap_or_default();
+            Ok("".to_string())
+        }
+    }
 }
 
-enum TargetType {
-    File,
-    Directory,
-}
-
-pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
-    let mut arguments = raw_args.iter().peekable();
-    // the first argument should be location of the tome binary.
-    let tome_executable = match arguments.next() {
-        Some(arg) => arg,
-        None => return Err(String::from("0th argument should be the tome binary")),
-    };
-    let first_arg = match arguments.next() {
-        Some(arg) => arg,
-        None => return Err(String::from("at least one argument expected")),
-    };
-    // if the first command is init, then we should print the
-    // the contents of init, since a user is trying to instantiate.
-    if first_arg == "init" {
-        return commands::init(tome_executable, arguments);
-    }
-
-    let mut target = PathBuf::from(first_arg);
-    // next, we determine if we have a file or a directory,
-    // recursing down arguments until we've exhausted arguments
-    // that match a directory or file.
-    let mut target_type = TargetType::Directory;
-    let mut first_arg = true;
-    let mut command_type = CommandType::Execute;
-    // if no argument is passed, return help.
-    if arguments.peek().is_none() {
-        match commands::help(target.to_str().unwrap_or_default(), arguments) {
-            Ok(message) => return Ok(message),
-            Err(io_error) => return Err(format!("{}", io_error)),
-        }
-    }
-    while let Some(arg) = arguments.peek() {
-        // match against builtin commands
-        if first_arg {
-            match arg.as_ref() {
-                "--help" => {
-                    arguments.next();
-                    match commands::help(target.to_str().unwrap_or_default(), arguments) {
-                        Ok(message) => return Ok(message),
-                        Err(io_error) => return Err(format!("{}", io_error)),
-                    }
-                }
-                "--complete" => {
-                    arguments.next();
-                    command_type = CommandType::Completion;
-                    continue;
-                }
-                _ => {}
-            }
-        }
-        first_arg = false;
-        target.push(arg);
-        if target.is_file() {
-            target_type = TargetType::File;
-            arguments.next();
-            break;
-        } else if target.is_dir() {
-            target_type = TargetType::Directory;
-            arguments.next();
-        } else {
-            // the current argument does not match
-            // a directory or a file, so we've landed
-            // on the strictest match.
-            target.pop();
-            break;
-        }
-    }
-    let remaining_args: Vec<_> = arguments.collect();
-    let output: String = match target_type {
-        TargetType::Directory => match command_type {
-            CommandType::Completion => {
-                let mut result = vec![];
-                let paths_raw: io::Result<_> = fs::read_dir(target.to_str().unwrap_or(""));
-                // TODO(zph) deftly fix panics when this code path is triggered with empty string: ie sc dir_example bar<TAB>
-                // current implementation avoids the panic but is crude.
-                let mut paths: Vec<_> = match paths_raw {
-                    Err(_a) => return Err("Invalid argument to completion".to_string()),
-                    Ok(a) => a,
-                }
-                .map(|r| r.unwrap())
-                .collect();
-                paths.sort_by_key(|f| f.path());
-                for path_buf in paths {
-                    let path = path_buf.path();
-                    if path.is_dir() && !directory::is_tome_script_directory(&path) {
-                        continue;
-                    }
-                    if path.is_file()
-                        && !script::is_tome_script(
-                            path_buf.file_name().to_str().unwrap_or_default(),
-                        )
-                    {
-                        continue;
-                    }
-                    result.push(path.file_name().unwrap().to_str().unwrap_or("").to_owned());
-                }
-                result.join(" ")
-            }
-            CommandType::Execute => {
-                return match remaining_args.len() {
-                    0 => Err(format!(
-                        "{} is a directory. tab-complete to choose subcommands",
-                        target.to_str().unwrap_or("")
-                    )),
-                    _ => Err(format!(
-                        "command {} not found in directory {}",
-                        remaining_args[0],
-                        target.to_str().unwrap_or("")
-                    )),
-                };
-            }
-        },
-        TargetType::File => match commands::Script::load(&target.to_str().unwrap_or_default()) {
-            Ok(script) => script.get_execution_body(command_type, &remaining_args)?,
-            Err(error) => return Err(format!("IOError loading file: {:?}", error)),
-        },
-    };
-    Ok(output)
+fn extract_positionals(app: &ArgMatches, name: &str) -> Vec<String> {
+    app.values_of_t(&name).unwrap_or_default()
 }

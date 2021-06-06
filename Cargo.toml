@@ -6,9 +6,9 @@ edition = "2018"
 license = "MIT"
 
 [dependencies]
-tui = "0.3.0"
-termion = "*"
-
-
+clap = "3.0.0-beta.2"
+clap_generate = "3.0.0-beta.2"
+log = "*"
+env_logger = "*"
 
 [dev-dependencies]
