@@ -7,6 +7,45 @@ mod script;
 #[cfg(test)]
 mod tests;
 
+fn directory_arg() -> clap::Arg<'static> {
+    Arg::new("directory")
+        .short('d')
+        .long("directory")
+        .about("Directory of scripts")
+        .takes_value(true)
+        .required(true)
+        .value_hint(clap::ValueHint::DirPath)
+}
+
+fn files_or_directory_arg() -> clap::Arg<'static> {
+    Arg::new("files_or_directory")
+        .multiple(true)
+        .value_hint(clap::ValueHint::AnyPath)
+}
+
+fn function_name_arg() -> clap::Arg<'static> {
+    Arg::new("function_name")
+        .index(1)
+        .about("Function name")
+        .required(true)
+}
+
+fn init_directory_arg() -> clap::Arg<'static> {
+    Arg::new("directory")
+        .index(2)
+        .about("Directory of scripts")
+        .takes_value(true)
+        .required(true)
+        .value_hint(clap::ValueHint::DirPath)
+}
+
+fn shell_arg() -> clap::Arg<'static> {
+    Arg::new("shell")
+        .index(3)
+        .about("Shell for init")
+        .required(true)
+}
+
 fn config() -> App<'static> {
     return App::new(clap::crate_name!())
         .version(clap::crate_version!())
@@ -22,100 +61,40 @@ fn config() -> App<'static> {
         .subcommand(
             App::new("help")
                 .about("Print help information")
+            .arg(directory_arg()),
+        )
+        .subcommand(
+            App::new("tome")
+                .about("Print help information")
+            .arg(directory_arg()),
         )
         .subcommand(
             App::new("commands")
                 .about("List available scripts")
-            .arg(
-                Arg::new("directory")
-                    .short('d')
-                    .long("directory")
-                    .about("Directory of scripts")
-                    .takes_value(true)
-                    .required(true)
-                    .value_hint(clap::ValueHint::DirPath),
-            ),
+            .arg(directory_arg())
         )
         .subcommand(
             App::new("init")
                 .about("Print shell completion")
-                .arg(
-                    Arg::new("function_name")
-                        .index(1)
-                        .about("Function name")
-                        .required(true),
-                )
-                .arg(
-                    Arg::new("shell")
-                        .index(3)
-                        .about("Shell for init")
-                        .required(true),
-                )
-                .arg(
-                    Arg::new("directory")
-                        .index(2)
-                        .about("Directory of scripts")
-                        .takes_value(true)
-                        .required(true)
-                        .value_hint(clap::ValueHint::DirPath),
-                ),
-        )
+                .arg(function_name_arg())
+                .arg(init_directory_arg())
+                .arg(shell_arg()))
         .subcommand(
             App::new("init_v2")
                 .about("Print shell completion")
-                .arg(
-                    Arg::new("function_name")
-                        .index(1)
-                        .about("Function name")
-                        .required(true),
-                )
-                .arg(
-                    Arg::new("shell")
-                        .index(3)
-                        .about("Shell for init")
-                        .required(true),
-                )
-                .arg(
-                    Arg::new("directory")
-                        .index(2)
-                        .about("Directory of scripts")
-                        .takes_value(true)
-                        .required(true)
-                        .value_hint(clap::ValueHint::DirPath),
-                ),
-        )
+                .arg(function_name_arg())
+                .arg(init_directory_arg())
+                .arg(shell_arg()))
         .subcommand(
             App::new("exec")
                 .about("Excute script")
-                .arg(
-                    Arg::new("directory")
-                        .short('d')
-                        .long("directory")
-                        .about("Directory of scripts")
-                        .takes_value(true)
-                        .required(true)
-                        .value_hint(clap::ValueHint::DirPath),
-                )
-                .arg(Arg::new("files_or_directory").multiple(true)),
-        )
+                .arg(directory_arg())
+                .arg(files_or_directory_arg()))
         .subcommand(
             App::new("complete")
                 .about("Output commandline autocompletion results")
-                .arg(
-                    Arg::new("directory")
-                        .short('d')
-                        .long("directory")
-                        .about("Directory of scripts")
-                        .takes_value(true)
-                        .required(true)
-                        .value_hint(clap::ValueHint::DirPath),
-                )
-                .arg(
-                    Arg::new("files_or_directory")
-                        .multiple(true)
-                        .value_hint(clap::ValueHint::AnyPath),
-                ),
-        );
+                .arg(directory_arg())
+                .arg(files_or_directory_arg()))
 }
 
 pub fn main() {
