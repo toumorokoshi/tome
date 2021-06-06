@@ -13,18 +13,15 @@ fn config() -> App<'static> {
         .author(clap::crate_authors!())
         .about(clap::crate_description!())
         .arg(
-            Arg::new("help")
-                .short('h')
-                .long("help")
-                .about("Print help information")
-                .takes_value(false),
-        )
-        .arg(
             Arg::new("v")
                 .short('v')
                 .long("verbose")
                 .multiple(true)
                 .about("Sets the level of verbosity"),
+        )
+        .subcommand(
+            App::new("help")
+                .about("Print help information")
         )
         .subcommand(
             App::new("commands")
