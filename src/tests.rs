@@ -17,6 +17,15 @@ fn test_simple_script() {
     );
 }
 
+/// the output should be the path to the script itself, with the passed arguments
+#[test]
+fn test_simple_script_with_args() {
+    assert_eq!(
+        execute(_vec_str(vec!["tome", EXAMPLE_DIR, "file_example", "x"])),
+        Ok(format!("'{}/file_example' 'x'", EXAMPLE_DIR))
+    );
+}
+
 #[test]
 fn test_simple_script_completion() {
     assert_eq!(

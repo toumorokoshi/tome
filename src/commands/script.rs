@@ -76,7 +76,7 @@ impl Script {
         }
     }
 
-    // return the appropriate string that should be exeucted within the
+    // return the appropriate string that should be executed within the
     // function.
     pub fn get_execution_body(
         &self,
@@ -125,7 +125,11 @@ impl Script {
                     }
                     command
                 } else {
-                    vec![self.path.clone()]
+                    let mut command = vec![self.path.clone()];
+                    for arg in args.iter() {
+                        command.push((**arg).clone());
+                    }
+                    command
                 };
                 // after figuring out the command, all resolved values
                 // should be quoted, to ensure that the shell does not
