@@ -1,6 +1,7 @@
 use std::{
     env,
     iter::{Iterator, Peekable},
+    path::Path,
     slice::Iter,
 };
 
@@ -185,7 +186,7 @@ pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>) -> Result<S
         Ok(val) => val,
         Err(e) => return Err(format!("Unable to fetch ENV var $SHELL with error: {}", e)),
     };
-    let shell_type = match args.next() {
+    let shell_type_or_path = match args.next() {
         Some(arg) => arg,
         None => {
             // fish shell does not pass $0 as fish, fallback to reading $SHELL
@@ -197,6 +198,27 @@ pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>) -> Result<S
                     "function name required for init invocation"
                 ));
             }
+        }
+    };
+    // strip any leading directories. The root should be the shell.
+    let shell_type = match Path::new(shell_type_or_path).file_stem() {
+        Some(p) => match p.to_str() {
+            Some(inner_p) => inner_p,
+            None => {
+                return Err(format!(
+                    init_help_body!(),
+                    format!(
+                        "could not convert shell type to string for '{}'",
+                        shell_type_or_path
+                    )
+                ));
+            }
+        },
+        None => {
+            return Err(format!(
+                init_help_body!(),
+                format!("could not find shell type for '{}'", shell_type_or_path)
+            ));
         }
     };
     // Bootstrapping the sc section requires two parts:
