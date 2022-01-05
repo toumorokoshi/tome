@@ -29,6 +29,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: ./target/release/tome-linux
+          files: ./target/release/tome-linux_amd64
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: true
