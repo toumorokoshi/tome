@@ -1,7 +1,7 @@
+use super::super::shell_type::{get_shell_type, ShellType};
 use std::{
     env,
     iter::{Iterator, Peekable},
-    path::Path,
     slice::Iter,
 };
 
@@ -195,32 +195,13 @@ pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>) -> Result<S
             } else {
                 return Err(format!(
                     init_help_body!(),
-                    "function name required for init invocation"
+                    "shell name is required for init invocation"
                 ));
             }
         }
     };
-    // strip any leading directories. The root should be the shell.
-    let shell_type = match Path::new(shell_type_or_path).file_stem() {
-        Some(p) => match p.to_str() {
-            Some(inner_p) => inner_p,
-            None => {
-                return Err(format!(
-                    init_help_body!(),
-                    format!(
-                        "could not convert shell type to string for '{}'",
-                        shell_type_or_path
-                    )
-                ));
-            }
-        },
-        None => {
-            return Err(format!(
-                init_help_body!(),
-                format!("could not find shell type for '{}'", shell_type_or_path)
-            ));
-        }
-    };
+
+    let shell_type = get_shell_type(shell_type_or_path)?;
     // Bootstrapping the sc section requires two parts:
     // 1. creating the function in question
     // 2. wiring up tab completion for the function.
@@ -230,18 +211,21 @@ pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>) -> Result<S
     // current environment (such as cd you into a specific)
     // directory.
     match shell_type {
-        "fish" => Ok(format!(
+        ShellType::FISH => Ok(format!(
             fish_init_body!(),
             tome_executable = tome_executable,
             script_root = script_root,
             function_name = function_name
         )),
-        "bash" | "zsh" => Ok(format!(
+        ShellType::BASH | ShellType::ZSH => Ok(format!(
             bash_zsh_init_body!(),
             tome_executable = tome_executable,
             script_root = script_root,
             function_name = function_name
         )),
-        _ => Err(format!("Unknown shell {}. Unable to init.", shell_type)),
+        ShellType::UNKNOWN => Err(format!(
+            "could not determine shell from {}. Unable to init.",
+            shell_type_or_path
+        )),
     }
 }

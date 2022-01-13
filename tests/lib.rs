@@ -1,5 +1,5 @@
-use super::execute;
 use std::env;
+use tome::execute;
 
 const EXAMPLE_DIR: &'static str = "./example";
 
