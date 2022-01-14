@@ -1,6 +1,6 @@
 use rstest::*;
 
-use tome::shell_type::{get_shell_type, ShellType};
+use super::shell_type::{get_shell_type, ShellType};
 
 #[rstest]
 #[case::bash("bash", Ok(ShellType::BASH))]

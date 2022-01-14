@@ -5,6 +5,12 @@ pub mod directory;
 pub mod script;
 pub mod shell_type;
 
+#[cfg(test)]
+mod shell_type_tests;
+
+#[cfg(test)]
+mod lib_tests;
+
 pub enum CommandType {
     Execute,
     Completion,

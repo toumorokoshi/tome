@@ -1,5 +1,5 @@
+use super::*;
 use std::io::{Cursor, Read};
-use tome::commands::*;
 /// if a script has "SOURCE"
 /// at the top, it should be sourced in.
 #[test]

@@ -4,3 +4,5 @@ mod script;
 pub use self::help::help;
 pub use self::init::init;
 pub use self::script::Script;
+#[cfg(test)]
+mod tests;
