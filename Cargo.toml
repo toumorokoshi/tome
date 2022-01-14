@@ -12,3 +12,4 @@ termion = "*"
 
 
 [dev-dependencies]
+rstest = "0.12.0"
