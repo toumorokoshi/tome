@@ -1,10 +1,10 @@
-use super::*;
+use super::super::script;
 use std::io::{Cursor, Read};
 /// if a script has "SOURCE"
 /// at the top, it should be sourced in.
 #[test]
 fn test_should_source() {
-    let script = Script::load_from_buffer(
+    let script = script::Script::load_from_buffer(
         String::from("./example/foo"),
         Box::new(Cursor::new(
             "# SOURCE
@@ -19,7 +19,7 @@ cd /tmp/
 /// at the top, it should be sourced in.
 #[test]
 fn test_should_not_source() {
-    let script = Script::load_from_buffer(
+    let script = script::Script::load_from_buffer(
         String::from("./example/foo"),
         Box::new(Cursor::new(
             "#!/usr/bin/env bash
@@ -32,7 +32,7 @@ echo foo
 
 #[test]
 fn test_help() {
-    let script = Script::load_from_buffer(
+    let script = script::Script::load_from_buffer(
         String::from("./example/foo"),
         Box::new(Cursor::new(
             "#!/usr/bin/env bash
@@ -47,7 +47,7 @@ fn test_help() {
 
 #[test]
 fn test_usage() {
-    let script = Script::load_from_buffer(
+    let script = script::Script::load_from_buffer(
         String::from("./example/foo"),
         Box::new(Cursor::new(
             "#!/usr/bin/env bash

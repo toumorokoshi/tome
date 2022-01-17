@@ -1,4 +1,4 @@
-use super::commands::Script;
+use super::script::Script;
 use std::{fs::read_dir, io, path::Path};
 
 /// scan a directory for all files,
@@ -23,14 +23,14 @@ pub fn scan_directory(
         if path.is_dir() {
             if is_tome_script_directory(&path) {
                 result.extend(scan_directory(
-                    &path.as_path().to_str().unwrap_or_default(),
+                    path.as_path().to_str().unwrap_or_default(),
                     previous_commands,
                 )?);
             }
         } else {
             result.push((
                 previous_commands.join(" "),
-                Script::load(&path.as_path().to_str().unwrap_or_default())?,
+                Script::load(path.as_path().to_str().unwrap_or_default())?,
             ));
         }
         previous_commands.pop();
