@@ -20,6 +20,15 @@ jobs:
         uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: e2e-test
+        run: |
+          sudo apt-get install zsh -y
+          sudo touch /etc/zsh/zshenv
+          echo "zsh-newuser-install() {:;}" | sudo tee -a /etc/zsh/zshenv
+          echo "testing bash"
+          bash -i scripts/e2e-test.sh bash
+          echo "testing zsh"
+          zsh -i scripts/e2e-test.sh zsh
       - name: build-release
         if: startsWith(github.ref, 'refs/tags/')
         run: |

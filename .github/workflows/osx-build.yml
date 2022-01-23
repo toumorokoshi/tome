@@ -16,6 +16,10 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
+      - name: e2e-test
+        run: |
+          bash -i scripts/e2e-test.sh bash
+          zsh -i scripts/e2e-test.sh zsh
       - name: build-release
         if: startsWith(github.ref, 'refs/tags/')
         run: |
