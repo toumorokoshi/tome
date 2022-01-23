@@ -1,5 +1,4 @@
 use super::super::directory::scan_directory;
-use std::{io, iter::Peekable, slice::Iter};
 
 macro_rules! help_template {
     () => {
@@ -8,13 +7,17 @@ macro_rules! help_template {
 \nThe commands are namespaced by the directory structure.
 \nFull list of commands available are:
 \n    {}
-';"#;
+';"#
     };
 }
 
-pub fn help(root: &str, mut _args: Peekable<Iter<String>>) -> io::Result<String> {
+pub fn help(root: &str) -> Result<String, String> {
     let mut commands_with_help = vec![];
-    for (command, script) in scan_directory(root, &mut vec![])? {
+    let commands_and_scripts = match scan_directory(root, &mut vec![]) {
+        Ok(result) => result,
+        Err(io_error) => return Err(format!("{}", io_error)),
+    };
+    for (command, script) in commands_and_scripts {
         commands_with_help.push(format!(
             "    {}: {}",
             escape_slashes(&command),

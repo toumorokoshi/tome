@@ -6,8 +6,7 @@ edition = "2018"
 license = "MIT"
 
 [dependencies]
-tui = "0.3.0"
-termion = "*"
+clap = { version = "3.0.7", features = ["derive"]}
 
 
 

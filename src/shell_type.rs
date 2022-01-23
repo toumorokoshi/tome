@@ -48,5 +48,5 @@ pub fn get_shell_type(shell_executable_path: &str) -> Result<ShellType, String> 
         return Ok(ShellType::ZSH);
     }
 
-    return Ok(ShellType::UNKNOWN);
+    Ok(ShellType::UNKNOWN)
 }

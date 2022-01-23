@@ -1,15 +1,14 @@
-use super::super::shell_type::{get_shell_type, ShellType};
-use std::{
-    env,
-    iter::{Iterator, Peekable},
-    slice::Iter,
+use super::super::{
+  cli::InitArgs,
+  shell_type::{get_shell_type, ShellType},
 };
+use std::env;
 
 // unfortunately static strings cannot
 // be used in format, so we use a macro instaed.
 macro_rules! init_help_body {
-    () => {
-        r#""
+  () => {
+    r#""
 error: {}
 
 An example tome init invocation looks like:
@@ -32,7 +31,7 @@ The "source" is important as tome init will print a shell snippet
 that should be executed to bootstrap your command. the <() syntax creates
 a file descriptor that the output has been written to, that should be sourced.
 "#
-    };
+  };
 }
 
 // because this string is intended to be formatted,
@@ -40,8 +39,8 @@ a file descriptor that the output has been written to, that should be sourced.
 // strings that will be evaluated by rust have single brackets: { }
 // strings that will be evaluated as part of the script have double brackets: {{ }}
 macro_rules! bash_zsh_init_body {
-    () => {
-        r#"
+  () => {
+    r#"
 if [[ -n ${{ZSH_VERSION-}} ]]; then
     # bash completion emulation requires that zsh's completion has
     # already been initialized. In addition, running the autoload
@@ -64,7 +63,7 @@ function {function_name} {{
     # capturing the results as a variable led to the command
     # being to long for zsh to execute. (literally raising
     # "command too long" )
-    eval `{tome_executable} {script_root} $@`
+    eval `{tome_executable} command-execute {script_root} -- $@`
 }}
 
 function _{function_name}_completions {{
@@ -73,19 +72,19 @@ function _{function_name}_completions {{
     tome_args=${{COMP_LINE:2}};  # strip the first argument prefix, which is the function name
     # strip the partial token_to_complete, if there is one
     tome_args=${{tome_args%$token_to_complete}};
-    all_options=`{tome_executable} {script_root} --complete $tome_args`
+    all_options=`{tome_executable} command-complete {script_root} -- $tome_args`
     valid_options=$(compgen -W "$all_options" "$token_to_complete")
     COMPREPLY=($valid_options)
 }}
 
 complete -F _{function_name}_completions {function_name}
 "#
-    };
+  };
 }
 
 macro_rules! fish_init_body {
-    () => {
-        r#"
+  () => {
+    r#"
 function __fish_tome_help_message
   echo -e "--help\tPrint help\n"
 end
@@ -144,7 +143,7 @@ function __fish_tome_completion_fn
   set -l cmdline (commandline -co)
   # Drop function name
   set -l cmd $cmdline[2..-1]
-  set -l args "{tome_executable}" $dir "--complete" $cmd
+  set -l args "{tome_executable}" command-complete $dir -- $cmd
   __fish_tome_completion_inner $args
 end
 
@@ -152,80 +151,61 @@ complete -c tome -f -a "(__fish_tome_completion)"
 
 # Alias for tome command
 function {function_name}
-  eval ({tome_executable} {script_root} $argv)
+  eval ({tome_executable} command-execute {script_root} -- $argv)
 end
 complete -c {function_name} -f -a "(__fish_tome_completion_fn {script_root} $argv)"
 # End tome alias
 "#
-    };
+  };
 }
 
 // given the location of the tome executable, return
 // back the init script for tome.
-
-pub fn init(tome_executable: &str, mut args: Peekable<Iter<String>>) -> Result<String, String> {
-    let function_name = match args.next() {
-        Some(arg) => arg,
-        None => {
-            return Err(format!(
-                init_help_body!(),
-                "function name required for init invocation"
-            ))
-        }
-    };
-    let script_root = match args.next() {
-        Some(arg) => arg,
-        None => {
-            return Err(format!(
-                init_help_body!(),
-                "function name required for init invocation"
-            ))
-        }
-    };
-    let shell_env = match env::var("SHELL") {
-        Ok(val) => val,
-        Err(e) => return Err(format!("Unable to fetch ENV var $SHELL with error: {}", e)),
-    };
-    let shell_type_or_path = match args.next() {
-        Some(arg) => arg,
-        None => {
-            // fish shell does not pass $0 as fish, fallback to reading $SHELL
-            if shell_env.contains("fish") {
-                "fish"
-            } else {
-                return Err(format!(
-                    init_help_body!(),
-                    "shell name is required for init invocation"
-                ));
-            }
-        }
-    };
-
-    let shell_type = get_shell_type(shell_type_or_path)?;
-    // Bootstrapping the sc section requires two parts:
-    // 1. creating the function in question
-    // 2. wiring up tab completion for the function.
-    //
-    // functions must be used instead of a script, as
-    // tome also supports commands that modify the
-    // current environment (such as cd you into a specific)
-    // directory.
-    match shell_type {
-        ShellType::FISH => Ok(format!(
-            fish_init_body!(),
-            tome_executable = tome_executable,
-            script_root = script_root,
-            function_name = function_name
-        )),
-        ShellType::BASH | ShellType::ZSH => Ok(format!(
-            bash_zsh_init_body!(),
-            tome_executable = tome_executable,
-            script_root = script_root,
-            function_name = function_name
-        )),
-        ShellType::UNKNOWN => Err(format!(
-            "could not determine shell from {}. Unable to init.",
-            shell_type_or_path
-        )),
+pub fn init(tome_executable: &str, init_args: &InitArgs) -> Result<String, String> {
+  let shell_env = match env::var("SHELL") {
+    Ok(val) => val,
+    Err(e) => return Err(format!("Unable to fetch ENV var $SHELL with error: {}", e)),
+  };
+  let shell_type_or_path = match &init_args.shell_type_or_path {
+    Some(arg) => arg,
+    None => {
+      // fish shell does not pass $0 as fish, fallback to reading $SHELL
+      if shell_env.contains("fish") {
+        "fish"
+      } else {
+        return Err(format!(
+          init_help_body!(),
+          "shell name is required for init invocation"
+        ));
+      }
     }
+  };
+
+  let shell_type = get_shell_type(shell_type_or_path)?;
+  // Bootstrapping the sc section requires two parts:
+  // 1. creating the function in question
+  // 2. wiring up tab completion for the function.
+  //
+  // functions must be used instead of a script, as
+  // tome also supports commands that modify the
+  // current environment (such as cd you into a specific)
+  // directory.
+  match shell_type {
+    ShellType::FISH => Ok(format!(
+      fish_init_body!(),
+      tome_executable = tome_executable,
+      script_root = init_args.command_directory_path,
+      function_name = init_args.command_name,
+    )),
+    ShellType::BASH | ShellType::ZSH => Ok(format!(
+      bash_zsh_init_body!(),
+      tome_executable = tome_executable,
+      script_root = init_args.command_directory_path,
+      function_name = init_args.command_name,
+    )),
+    ShellType::UNKNOWN => Err(format!(
+      "could not determine shell from {}. Unable to init.",
+      shell_type_or_path
+    )),
+  }
 }
