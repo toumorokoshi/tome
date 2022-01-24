@@ -49,7 +49,10 @@ if [[ -n ${{ZSH_VERSION-}} ]]; then
     # previously bound by tome, resulting in the inability to
     # instantiate multiple tome command sets.
     if ! type complete > /dev/null; then
-        autoload +X compinit && compinit
+        # add -C "" to skip compaudit, which forces
+        # an interactive dialog for compinit which doesn't
+        # work for interactive shells.
+        autoload +X compinit && compinit -C ""
     fi
     autoload +X bashcompinit && bashcompinit
 

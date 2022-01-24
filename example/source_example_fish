@@ -1,0 +1,15 @@
+# SOURCE
+# SUMMARY: an example for sourcing variables
+# START HELP
+# This is an example of a script that is sourced, rather
+# than executed. This means that anything you run in here
+# will affect the parent environment.
+# effectively, you have similar behavior you would have with
+# a shell function.
+# END HELP
+# you can set environment variables and it'll
+# affect the outer shell.
+set EDITOR "vim"
+set DEV_ENVIRONMENT "production"
+# or navigate to other directories.
+cd /tmp
