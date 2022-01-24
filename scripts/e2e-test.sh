@@ -2,12 +2,12 @@
 # This script runs and end-to-end test to ensure that tome
 # works for the shell and operating system used.
 #
-# Although bash is mentiond, this is designed to work with
+# Although bash is mentioned, this is designed to work with
 # multiple shells.
 #
 # requirements:
 # - ran from the root of the tome repository
-set -eix
+set -ex
 SHELL="$1"
 export SHELL
 

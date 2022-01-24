@@ -22,13 +22,13 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: e2e-test
         run: |
-          sudo apt-get install zsh -y
-          sudo touch /etc/zsh/zshenv
-          echo "zsh-newuser-install() {:;}" | sudo tee -a /etc/zsh/zshenv
+          sudo apt-get install zsh fish -y
           echo "testing bash"
-          bash -i scripts/e2e-test.sh bash
+          bash scripts/e2e-test.sh bash
           echo "testing zsh"
-          zsh -i scripts/e2e-test.sh zsh
+          zsh scripts/e2e-test.sh zsh
+          echo "testing fish"
+          fish scripts/e2e-test.fish fish
       - name: build-release
         if: startsWith(github.ref, 'refs/tags/')
         run: |

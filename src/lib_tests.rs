@@ -109,7 +109,7 @@ fn test_directory_completion() {
 fn test_root_directory_completion() {
     assert_eq!(
         execute(_vec_str(vec!["tome", "command-complete", EXAMPLE_DIR])),
-        Ok("dir_example file_example practical_examples source_example use-arg".to_string())
+        Ok("dir_example file_example practical_examples source_example source_example_fish use-arg".to_string())
     );
 }
 
