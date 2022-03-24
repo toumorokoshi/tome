@@ -7,7 +7,7 @@
 #
 # requirements:
 # - ran from the root of the tome repository
-set -ex
+set -e # add -x to get verbose output
 SHELL="$1"
 export SHELL
 

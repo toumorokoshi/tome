@@ -7,7 +7,8 @@
 #
 # requirements:
 # - ran from the root of the tome repository
-set -x
+# uncomment to get verbose output for debugging
+# set -x
 set SHELL "$argv[1]"
 export SHELL
 
