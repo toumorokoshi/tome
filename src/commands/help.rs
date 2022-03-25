@@ -34,5 +34,5 @@ pub fn help(root: &str) -> Result<String, String> {
 // escape slash characters with posix-compatible quotes. Helps if the echo
 // command uses slashes
 fn escape_slashes(s: &str) -> String {
-    s.replace("'", "'\\''")
+    s.replace('\'', "'\\''")
 }

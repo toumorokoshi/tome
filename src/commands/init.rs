@@ -72,7 +72,7 @@ function {function_name} {{
 function _{function_name}_completions {{
     local token_to_complete tome_args
     token_to_complete="${{COMP_WORDS[COMP_CWORD]}}";
-    tome_args=${{COMP_LINE:2}};  # strip the first argument prefix, which is the function name
+    tome_args=${{COMP_WORDS[@]:1}};  # strip the first argument prefix, which is the function name
     # strip the partial token_to_complete, if there is one
     tome_args=${{tome_args%$token_to_complete}};
     all_options=`{tome_executable} command-complete {script_root} -- $tome_args`
