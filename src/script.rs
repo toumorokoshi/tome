@@ -141,7 +141,7 @@ impl Script {
                 // interpret character sequences.
                 let mut escaped_command_string = vec![];
                 for mut arg in command_string {
-                    arg = arg.replace("'", "\\'");
+                    arg = arg.replace('\'', "\\'");
                     arg.insert(0, '\'');
                     arg.push('\'');
                     escaped_command_string.push(arg);
