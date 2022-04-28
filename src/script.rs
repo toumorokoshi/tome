@@ -13,7 +13,7 @@ use std::{
 };
 /// Any executable script
 /// can be added to be executed, but
-/// t's possible to add metadata
+/// It's possible to add metadata
 /// to the script via comments as well.
 pub struct Script {
     /// the path the script is located at.

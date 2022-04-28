@@ -1,5 +1,8 @@
 use clap::Parser;
 
+#[macro_use]
+extern crate lazy_static;
+
 pub mod cli;
 pub mod commands;
 pub mod directory;

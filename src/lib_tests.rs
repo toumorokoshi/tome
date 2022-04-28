@@ -109,7 +109,8 @@ fn test_directory_completion() {
 fn test_root_directory_completion() {
     assert_eq!(
         execute(_vec_str(vec!["tome", "command-complete", EXAMPLE_DIR])),
-        Ok("dir_example file_example practical_examples source_example source_example_fish use-arg".to_string())
+        // note that we also complete with builtins
+        Ok("commands dir_example exec file_example help practical_examples source_example source_example_fish tome use-arg".to_string())
     );
 }
 
@@ -202,22 +203,61 @@ fn test_dangerous_characters_quoted() {
     );
 }
 
-/// help should be returned in no arguments are passed
+/// tome should add a "help" command into every instance, to
+/// output help documentation.
+#[test]
+fn test_execute_help() {
+    let result = execute(_vec_str(vec![
+        "tome",
+        "command-execute",
+        EXAMPLE_DIR,
+        "--",
+        "help",
+    ]))
+    .unwrap();
+    assert_is_help_text(&result)
+}
+
+/// tome should add a "commands" command which lists all
+/// available commands.
+#[test]
+fn test_execute_commands() {
+    let result = execute(_vec_str(vec![
+        "tome",
+        "command-execute",
+        EXAMPLE_DIR,
+        "--",
+        "commands",
+    ]))
+    .unwrap();
+    assert_is_help_text(&result)
+}
+
+/// help should be returned if help is called explicitly
 #[test]
 fn test_help_page() {
     let result = execute(_vec_str(vec!["tome", "command-help", EXAMPLE_DIR])).unwrap();
-    println!("{}", result);
-    assert_eq!(result.matches("'\\''").count(), 1);
-    assert_eq!(result.matches("'").count(), 5);
-    assert!(result.contains("echo -e"));
+    assert_is_help_text(&result)
 }
 
-/// help should be returned if "help" is called explicitly
+/// help should be returned if no arguments are passed.
 #[test]
 fn test_help_page_when_execute_no_args() {
     let result = execute(_vec_str(vec!["tome", "command-execute", EXAMPLE_DIR, "--"])).unwrap();
-    println!("{}", result);
+    assert_is_help_text(&result)
+}
+
+// helper function to assert that the output
+// is indeed the help text.
+fn assert_is_help_text(result: &str) {
+    // uncomment to see output
+    // println!("{}", result);
     assert_eq!(result.matches("'\\''").count(), 1);
     assert_eq!(result.matches("'").count(), 5);
     assert!(result.contains("echo -e"));
+    // verify that builtin tome commands are present
+    assert!(result.contains("commands:"));
+    assert!(result.contains("exec:"));
+    assert!(result.contains("help:"));
+    assert!(result.contains("tome:"));
 }
