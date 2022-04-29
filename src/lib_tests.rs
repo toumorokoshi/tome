@@ -7,6 +7,41 @@ fn _vec_str(args: Vec<&str>) -> Vec<String> {
     args.iter().map(|s| s.to_string()).collect()
 }
 
+/// test exec, which should execute a tome
+/// command
+#[test]
+fn test_exec_simple_script() {
+    assert_eq!(
+        execute(_vec_str(vec![
+            "tome",
+            "command-execute",
+            EXAMPLE_DIR,
+            "--",
+            "exec",
+            "file_example"
+        ])),
+        Ok(format!("'{}/file_example'", EXAMPLE_DIR))
+    );
+}
+
+// test exec should work, even when called
+// recursively.
+#[test]
+fn test_exec_recursive_simple_script() {
+    assert_eq!(
+        execute(_vec_str(vec![
+            "tome",
+            "command-execute",
+            EXAMPLE_DIR,
+            "--",
+            "exec",
+            "exec",
+            "file_example"
+        ])),
+        Ok(format!("'{}/file_example'", EXAMPLE_DIR))
+    );
+}
+
 /// basic test for a simple script.
 /// the output should be the path to the script itself.
 #[test]

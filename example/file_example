@@ -13,5 +13,4 @@ import sys
 if len(sys.argv) > 1 and sys.argv[1] == "--complete":
     sys.stdout.write("file autocomplete example")
 else:
-    sys.stdout.write("file autocomplete example")
-    # print("hello")
+    print("hello")
