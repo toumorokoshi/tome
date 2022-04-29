@@ -9,8 +9,8 @@ pub fn scan_directory(
     previous_commands: &mut Vec<String>,
 ) -> io::Result<Vec<(String, Script)>> {
     let mut result = vec![];
-    let mut paths: Vec<_> = read_dir(root).unwrap().map(|r| r.unwrap()).collect();
-    paths.sort_by_key(|f| f.path());
+    let paths: Vec<_> = read_dir(root).unwrap().map(|r| r.unwrap()).collect();
+    // paths.sort_by_key(|f| f.path());
     for entry in paths {
         let path = entry.path();
         previous_commands.push(

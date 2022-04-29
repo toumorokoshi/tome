@@ -2,7 +2,7 @@ use super::super::{
     script,
     types::{CommandType, TargetType},
 };
-use super::help;
+use super::{builtins::BUILTIN_COMMANDS, help};
 use std::path::PathBuf;
 
 pub fn execute(command_directory_path: &str, args: &[String]) -> Result<String, String> {
@@ -16,6 +16,16 @@ pub fn execute(command_directory_path: &str, args: &[String]) -> Result<String, 
     if args_peekable.peek().is_none() {
         return help::help(command_directory_path);
     }
+    // special handling for root subcommmand for reserved
+    // commands
+    match args_peekable.peek() {
+        Some(&command_name) => match BUILTIN_COMMANDS.get(command_name) {
+            Some(command) => return (command.func)(command_directory_path, args),
+            None => {}
+        },
+        None => {}
+    }
+    // generic handling
     while let Some(arg) = args_peekable.peek() {
         target.push(arg);
         if target.is_file() {

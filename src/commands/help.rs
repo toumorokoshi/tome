@@ -1,10 +1,13 @@
 use super::super::directory::scan_directory;
+use super::builtins::BUILTIN_COMMANDS;
 
 macro_rules! help_template {
     () => {
         r#"echo -e
 'This is an instance of tome, running against the directory {}.
 \nThe commands are namespaced by the directory structure.
+\nBuiltin commands available to all instance of tome are:
+\n    {}
 \nFull list of commands available are:
 \n    {}
 ';"#
@@ -12,6 +15,16 @@ macro_rules! help_template {
 }
 
 pub fn help(root: &str) -> Result<String, String> {
+    let mut builtins_with_help = vec![];
+    // print builtins first
+    for (command, command_struct) in BUILTIN_COMMANDS.iter() {
+        builtins_with_help.push(format!(
+            "    {}: {}",
+            escape_slashes(&command),
+            escape_slashes(&command_struct.help_text),
+        ))
+    }
+
     let mut commands_with_help = vec![];
     let commands_and_scripts = match scan_directory(root, &mut vec![]) {
         Ok(result) => result,
@@ -24,10 +37,12 @@ pub fn help(root: &str) -> Result<String, String> {
             escape_slashes(&script.summary_string)
         ))
     }
+
     Ok(format!(
         help_template!(),
         root,
-        commands_with_help.join("\\n")
+        builtins_with_help.join("\\n"),
+        commands_with_help.join("\\n"),
     ))
 }
 
