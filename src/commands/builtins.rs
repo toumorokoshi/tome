@@ -1,4 +1,4 @@
-use super::help::help;
+use super::{execute::execute, help::help};
 use std::collections::HashMap;
 
 pub struct Command {
@@ -19,7 +19,7 @@ lazy_static! {
         m.insert(
             "exec".to_owned(),
             Command {
-                func: noop_command as fn(&str, &[String]) -> Result<String, String>,
+                func: exec_command as fn(&str, &[String]) -> Result<String, String>,
                 help_text: "execute a command",
             },
         );
@@ -39,6 +39,11 @@ lazy_static! {
         );
         m
     };
+}
+
+fn exec_command(root: &str, args: &[String]) -> Result<String, String> {
+    // strip the first argument since it should be "exec"
+    execute(root, &args[1..])
 }
 
 fn help_command(root: &str, _: &[String]) -> Result<String, String> {
