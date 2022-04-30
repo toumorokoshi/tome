@@ -14,7 +14,7 @@ export SHELL
 cargo build --release
 # init the tome in question
 # $SHELL doesn't work in this context, albeit preferable,
-# as it's not available during GitHub workflow runs.
+# as it's not available during GitHub workf>low runs.
 eval "$(./target/release/tome init e ./example $SHELL)"
 
 # regular script example

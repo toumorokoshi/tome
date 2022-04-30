@@ -88,6 +88,24 @@ fn test_simple_script_completion() {
     );
 }
 
+/// Unless the file has the completion annotation
+/// do not invoked completion on it and return nothing
+/// instead.
+#[test]
+fn test_simple_script_no_completion() {
+    assert_eq!(
+        execute(_vec_str(vec![
+            "tome",
+            "command-complete",
+            EXAMPLE_DIR,
+            "--",
+            "test_files",
+            "file_example_no_completion",
+        ])),
+        Ok(String::from(""))
+    );
+}
+
 /// basic test for a script that should be sourced
 #[test]
 fn test_source() {
@@ -145,7 +163,7 @@ fn test_root_directory_completion() {
     assert_eq!(
         execute(_vec_str(vec!["tome", "command-complete", EXAMPLE_DIR])),
         // note that we also complete with builtins
-        Ok("commands dir_example exec file_example help practical_examples source_example source_example_fish tome use-arg".to_string())
+        Ok("commands dir_example exec file_example help practical_examples source_example source_example_fish test_files tome use-arg".to_string())
     );
 }
 
@@ -287,8 +305,8 @@ fn test_help_page_when_execute_no_args() {
 fn assert_is_help_text(result: &str) {
     // uncomment to see output
     // println!("{}", result);
-    assert_eq!(result.matches("'\\''").count(), 1);
-    assert_eq!(result.matches("'").count(), 5);
+    assert_eq!(result.matches("'\\''").count(), 2);
+    assert_eq!(result.matches("'").count(), 8);
     assert!(result.contains("echo -e"));
     // verify that builtin tome commands are present
     assert!(result.contains("commands:"));

@@ -16,16 +16,19 @@ use std::{
 /// It's possible to add metadata
 /// to the script via comments as well.
 pub struct Script {
+    pub help_string: String,
+    /// the string that should be used for
+    /// usage information
     /// the path the script is located at.
     pub path: String,
     /// determines if the script should
     /// be sourced or not.
     pub should_source: bool,
+    /// determines if the script should
+    /// have completion invoked or not.
+    pub should_complete: bool,
     /// the string that should be printed
     /// when help is requested.
-    pub help_string: String,
-    /// the string that should be used for
-    /// usage information
     pub summary_string: String,
 }
 
@@ -36,6 +39,7 @@ impl Script {
     }
     pub fn load_from_buffer(path: String, body: Box<dyn Read>) -> Script {
         let mut buffer = BufReader::new(body);
+        let mut should_complete = false;
         let mut should_source = false;
         let mut help_string = String::new();
         let mut summary_string = String::new();
@@ -59,6 +63,8 @@ impl Script {
                     // signifying continued help.
                     help_string.push_str(rest);
                 }
+            } else if line.starts_with("# COMPLETION") {
+                should_complete = true;
             } else if line.starts_with("# SOURCE") {
                 should_source = true;
             } else if line.starts_with("# START HELP") {
@@ -74,10 +80,11 @@ impl Script {
             }
         }
         Script {
-            path,
-            should_source,
-            help_string,
-            summary_string,
+            help_string: help_string,
+            path: path,
+            should_complete: should_complete,
+            should_source: should_source,
+            summary_string: summary_string,
         }
     }
 
@@ -90,6 +97,9 @@ impl Script {
     ) -> Result<String, String> {
         match command_type {
             CommandType::Completion => {
+                if !self.should_complete {
+                    return Ok(String::new());
+                }
                 // in the completion case, we need to execute the script itself.
                 // There's a possible optimization here
                 // if we just inherit parent file descriptors.
