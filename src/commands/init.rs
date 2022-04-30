@@ -14,10 +14,10 @@ error: {}
 An example tome init invocation looks like:
 
 # Bash/Zsh
-source <(tome init sc ~/my_script_dir $0)
+source <(tome init sc ~/my_script_dir bash)
 
 # Fish
-tome init sc ~/my_script_dir $0 | source
+tome init sc ~/my_script_dir fish | source
 
 The positional arguments are:
 

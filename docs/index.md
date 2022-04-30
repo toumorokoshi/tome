@@ -44,6 +44,8 @@ And add in some features for discoverability:
 * search all available commands (just enter your command with no arguments)
 * help commands
 
+More documentation can be found at [readthedocs](https://tome-scripts.readthedocs.org/).
+
 ## Why?
 
 Everyone has their own way of sharing scripts with each other. In my experience it usually comes down to a git repo and prepending things to the path.
@@ -100,7 +102,7 @@ eval "$(tome init my-commands ~/my-scripts zsh)"
 For fish shell:
 ```
 # in ~/.config/fish/conf.d/tome.fish
-tome init my-commands ~/my_script_dir $0 | source
+tome init my-commands ~/my_script_dir fish | source
 ```
 
 *NOTE*: make sure to include the double quotes with the nested backticks. This ensures that newlines are captured
