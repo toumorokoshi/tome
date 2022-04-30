@@ -5,7 +5,11 @@ use super::super::{
 use super::builtins::BUILTIN_COMMANDS;
 use std::{fs, io, path::PathBuf};
 
-pub fn complete(command_directory_path: &str, args: &[String]) -> Result<String, String> {
+pub fn complete(
+    command_directory_path: &str,
+    shell: &str,
+    args: &[String],
+) -> Result<String, String> {
     // TODO: refactor to share common logic with execute
     // determine if a file or a directory was passed,
     // recursing down arguments until we've exhausted arguments
@@ -13,6 +17,12 @@ pub fn complete(command_directory_path: &str, args: &[String]) -> Result<String,
     let mut target = PathBuf::from(&command_directory_path);
     let mut target_type = TargetType::Directory;
     let mut args_peekable = args.iter().peekable();
+    // handle if the first command is a builtin
+    if let Some(subcommand) = args_peekable.peek() {
+        if let Some(_) = BUILTIN_COMMANDS.get(*subcommand) {
+            return Ok(String::new());
+        }
+    }
     while let Some(arg) = args_peekable.peek() {
         target.push(arg);
         if target.is_file() {
@@ -66,7 +76,9 @@ pub fn complete(command_directory_path: &str, args: &[String]) -> Result<String,
             Ok(paths.join(" "))
         }
         TargetType::File => match script::Script::load(target.to_str().unwrap_or_default()) {
-            Ok(script) => script.get_execution_body(CommandType::Completion, &remaining_args),
+            Ok(script) => {
+                script.get_execution_body(CommandType::Completion, &shell, &remaining_args)
+            }
             Err(error) => return Err(format!("IOError loading file: {:?}", error)),
         },
     };

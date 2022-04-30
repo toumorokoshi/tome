@@ -21,6 +21,9 @@ pub enum TomeCommands {
 #[derive(Debug, Args)]
 pub struct CompleteArgs {
     pub command_directory_path: String,
+    /// The type of the shell that is invoking completion
+    #[clap(short, long)]
+    pub shell: String,
     #[clap(last = true)]
     pub args: Vec<String>,
 }
@@ -28,6 +31,8 @@ pub struct CompleteArgs {
 #[derive(Debug, Args)]
 pub struct ExecuteArgs {
     pub command_directory_path: String,
+    #[clap(short, long)]
+    pub shell: String,
     #[clap(last = true)]
     pub args: Vec<String>,
 }
@@ -44,6 +49,5 @@ pub struct InitArgs {
     /// The path to the directory that contains the commands to load.
     pub command_directory_path: String,
     /// The type of the shell to use, or the path to the shell executable being used.
-    /// If this is none, the SHELL environment variable will be used.
-    pub shell_type_or_path: Option<String>,
+    pub shell_type_or_path: String,
 }

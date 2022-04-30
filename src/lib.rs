@@ -27,11 +27,14 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
         Ok(tome_args) => match &tome_args.commands {
             cli::TomeCommands::CommandComplete(complete_args) => commands::complete::complete(
                 &complete_args.command_directory_path,
+                &complete_args.shell,
                 &complete_args.args,
             ),
-            cli::TomeCommands::CommandExecute(execute_args) => {
-                commands::execute::execute(&execute_args.command_directory_path, &execute_args.args)
-            }
+            cli::TomeCommands::CommandExecute(execute_args) => commands::execute::execute(
+                &execute_args.command_directory_path,
+                &execute_args.shell,
+                &execute_args.args,
+            ),
             cli::TomeCommands::CommandHelp(help_args) => {
                 commands::help::help(&help_args.command_directory_path)
             }

@@ -5,7 +5,6 @@ pub fn is_tome_script(filename: &str) -> bool {
 
 use super::types::CommandType;
 use std::{
-    env::var,
     fs::File,
     io,
     io::{prelude::*, BufReader, Read},
@@ -93,6 +92,7 @@ impl Script {
     pub fn get_execution_body(
         &self,
         command_type: CommandType,
+        shell: &str,
         args: &[&String],
     ) -> Result<String, String> {
         match command_type {
@@ -104,7 +104,7 @@ impl Script {
                 // There's a possible optimization here
                 // if we just inherit parent file descriptors.
                 let mut command = match self.should_source {
-                    true => Command::new(var("SHELL").unwrap_or_default()),
+                    true => Command::new(shell),
                     false => Command::new(self.path.clone()),
                 };
                 if self.should_source {

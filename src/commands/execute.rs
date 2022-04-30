@@ -5,7 +5,11 @@ use super::super::{
 use super::{builtins::BUILTIN_COMMANDS, help};
 use std::path::PathBuf;
 
-pub fn execute(command_directory_path: &str, args: &[String]) -> Result<String, String> {
+pub fn execute(
+    command_directory_path: &str,
+    shell: &str,
+    args: &[String],
+) -> Result<String, String> {
     // next, we determine if we have a file or a directory,
     // recursing down arguments until we've exhausted arguments
     // that match a directory or file.
@@ -20,7 +24,7 @@ pub fn execute(command_directory_path: &str, args: &[String]) -> Result<String, 
     // commands
     match args_peekable.peek() {
         Some(&command_name) => match BUILTIN_COMMANDS.get(command_name) {
-            Some(command) => return (command.func)(command_directory_path, args),
+            Some(command) => return (command.func)(command_directory_path, shell, args),
             None => {}
         },
         None => {}
@@ -57,7 +61,7 @@ pub fn execute(command_directory_path: &str, args: &[String]) -> Result<String, 
             )),
         },
         TargetType::File => match script::Script::load(target.to_str().unwrap_or_default()) {
-            Ok(script) => script.get_execution_body(CommandType::Execute, &remaining_args),
+            Ok(script) => script.get_execution_body(CommandType::Execute, &shell, &remaining_args),
             Err(error) => return Err(format!("IOError loading file: {:?}", error)),
         },
     };
