@@ -1,7 +1,7 @@
 use super::execute;
-use std::env;
 
 const EXAMPLE_DIR: &'static str = "./example";
+const SHELL: &'static str = "bash";
 
 fn _vec_str(args: Vec<&str>) -> Vec<String> {
     args.iter().map(|s| s.to_string()).collect()
@@ -15,6 +15,8 @@ fn test_exec_simple_script() {
         execute(_vec_str(vec![
             "tome",
             "command-execute",
+            "-s",
+            SHELL,
             EXAMPLE_DIR,
             "--",
             "exec",
@@ -32,6 +34,8 @@ fn test_exec_recursive_simple_script() {
         execute(_vec_str(vec![
             "tome",
             "command-execute",
+            "-s",
+            SHELL,
             EXAMPLE_DIR,
             "--",
             "exec",
@@ -50,6 +54,8 @@ fn test_simple_script() {
         execute(_vec_str(vec![
             "tome",
             "command-execute",
+            "-s",
+            SHELL,
             EXAMPLE_DIR,
             "--",
             "file_example"
@@ -65,6 +71,8 @@ fn test_simple_script_with_args() {
         execute(_vec_str(vec![
             "tome",
             "command-execute",
+            "-s",
+            SHELL,
             EXAMPLE_DIR,
             "--",
             "file_example",
@@ -80,6 +88,8 @@ fn test_simple_script_completion() {
         execute(_vec_str(vec![
             "tome",
             "command-complete",
+            "-s",
+            SHELL,
             EXAMPLE_DIR,
             "--",
             "file_example",
@@ -97,6 +107,8 @@ fn test_simple_script_no_completion() {
         execute(_vec_str(vec![
             "tome",
             "command-complete",
+            "-s",
+            SHELL,
             EXAMPLE_DIR,
             "--",
             "test_files",
@@ -113,6 +125,8 @@ fn test_source() {
         execute(_vec_str(vec![
             "tome",
             "command-execute",
+            "-s",
+            SHELL,
             EXAMPLE_DIR,
             "--",
             "source_example",
@@ -123,16 +137,12 @@ fn test_source() {
 
 #[test]
 fn test_source_completion() {
-    // Context: https://github.com/toumorokoshi/tome/issues/6
-    // Override SHELL env variable due to test depending on sourced file
-    // being a bash/zsh compatible sourced file.
-    // The behavior of sourcing scripts works in cli and we patch
-    // in tests to ensure consistent results.
-    env::set_var("SHELL", "bash");
     assert_eq!(
         execute(_vec_str(vec![
             "tome",
             "command-complete",
+            "-s",
+            "bash",
             EXAMPLE_DIR,
             "--",
             "source_example",
@@ -149,6 +159,8 @@ fn test_directory_completion() {
         execute(_vec_str(vec![
             "tome",
             "command-complete",
+            "-s",
+            "bash",
             EXAMPLE_DIR,
             "--",
             "dir_example",
@@ -161,9 +173,27 @@ fn test_directory_completion() {
 #[test]
 fn test_root_directory_completion() {
     assert_eq!(
-        execute(_vec_str(vec!["tome", "command-complete", EXAMPLE_DIR])),
+        execute(_vec_str(vec!["tome", "command-complete", "-s", "bash", EXAMPLE_DIR])),
         // note that we also complete with builtins
         Ok("commands dir_example exec file_example help practical_examples source_example source_example_fish test_files tome use-arg".to_string())
+    );
+}
+
+/// the tome command is a no-op, and shouldn't
+/// have completion
+#[test]
+fn test_tome_completion() {
+    assert_eq!(
+        execute(_vec_str(vec![
+            "tome",
+            "command-complete",
+            "-s",
+            SHELL,
+            EXAMPLE_DIR,
+            "--",
+            "tome",
+        ])),
+        Ok(String::from(""))
     );
 }
 
@@ -175,6 +205,8 @@ fn test_script_in_directory() {
         execute(_vec_str(vec![
             "tome",
             "command-execute",
+            "-s",
+            "bash",
             EXAMPLE_DIR,
             "--",
             "dir_example",
@@ -192,6 +224,8 @@ fn test_script_in_directory_not_found() {
         execute(_vec_str(vec![
             "tome",
             "command-execute",
+            "-s",
+            "bash",
             EXAMPLE_DIR,
             "--",
             "dir_example",
@@ -212,6 +246,8 @@ fn test_script_directory_argument() {
         execute(_vec_str(vec![
             "tome",
             "command-execute",
+            "-s",
+            "bash",
             EXAMPLE_DIR,
             "--",
             "dir_example",
@@ -232,6 +268,8 @@ fn test_use_arg() {
         execute(_vec_str(vec![
             "tome",
             "command-execute",
+            "-s",
+            "bash",
             EXAMPLE_DIR,
             "--",
             "use-arg"
@@ -248,6 +286,8 @@ fn test_dangerous_characters_quoted() {
         execute(_vec_str(vec![
             "tome",
             "command-execute",
+            "-s",
+            "bash",
             EXAMPLE_DIR,
             "--",
             "use-arg"
@@ -263,6 +303,8 @@ fn test_execute_help() {
     let result = execute(_vec_str(vec![
         "tome",
         "command-execute",
+        "-s",
+        "bash",
         EXAMPLE_DIR,
         "--",
         "help",
@@ -278,6 +320,8 @@ fn test_execute_commands() {
     let result = execute(_vec_str(vec![
         "tome",
         "command-execute",
+        "-s",
+        "bash",
         EXAMPLE_DIR,
         "--",
         "commands",
@@ -296,7 +340,15 @@ fn test_help_page() {
 /// help should be returned if no arguments are passed.
 #[test]
 fn test_help_page_when_execute_no_args() {
-    let result = execute(_vec_str(vec!["tome", "command-execute", EXAMPLE_DIR, "--"])).unwrap();
+    let result = execute(_vec_str(vec![
+        "tome",
+        "command-execute",
+        "-s",
+        "bash",
+        EXAMPLE_DIR,
+        "--",
+    ]))
+    .unwrap();
     assert_is_help_text(&result)
 }
 
