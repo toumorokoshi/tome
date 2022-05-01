@@ -1,6 +1,6 @@
 use super::super::{
-  cli::InitArgs,
-  shell_type::{get_shell_type, ShellType},
+    cli::InitArgs,
+    shell_type::{get_shell_type, ShellType},
 };
 
 // because this string is intended to be formatted,
@@ -55,14 +55,14 @@ complete -F _{function_name}_completions {function_name}
 }
 
 macro_rules! fish_init_body {
-  () => {
-    r#"
+    () => {
+        r#"
 function __fish_tome_help_message
   echo -e "--help\tPrint help\n"
 end
 
 function __fish_tome_complete_subcommands
-  # tome directory --complete COMPLETIONPREFIX
+  # tome directory --complete completion
   $argv[1] $argv[2] $argv[3] $argv[4..-1] | tr " " "\n"
   return 0
 end
@@ -128,39 +128,39 @@ end
 complete -c {function_name} -f -a "(__fish_tome_completion_fn {script_root} $argv)"
 # End tome alias
 "#
-  };
+    };
 }
 
 // given the location of the tome executable, return
 // back the init script for tome.
 pub fn init(tome_executable: &str, init_args: &InitArgs) -> Result<String, String> {
-  let shell = get_shell_type(&init_args.shell_type_or_path)?;
-  // Bootstrapping the sc section requires two parts:
-  // 1. creating the function in question
-  // 2. wiring up tab completion for the function.
-  //
-  // functions must be used instead of a script, as
-  // tome also supports commands that modify the
-  // current environment (such as cd you into a specific)
-  // directory.
-  match shell {
-    ShellType::FISH => Ok(format!(
-      fish_init_body!(),
-      tome_executable = tome_executable,
-      shell = &init_args.shell_type_or_path,
-      script_root = init_args.command_directory_path,
-      function_name = init_args.command_name,
-    )),
-    ShellType::BASH | ShellType::ZSH => Ok(format!(
-      bash_zsh_init_body!(),
-      tome_executable = tome_executable,
-      shell = &init_args.shell_type_or_path,
-      script_root = init_args.command_directory_path,
-      function_name = init_args.command_name,
-    )),
-    ShellType::UNKNOWN => Err(format!(
-      "could not determine shell from {}. Unable to init.",
-      &init_args.shell_type_or_path
-    )),
-  }
+    let shell = get_shell_type(&init_args.shell_type_or_path)?;
+    // Bootstrapping the sc section requires two parts:
+    // 1. creating the function in question
+    // 2. wiring up tab completion for the function.
+    //
+    // functions must be used instead of a script, as
+    // tome also supports commands that modify the
+    // current environment (such as cd you into a specific)
+    // directory.
+    match shell {
+        ShellType::FISH => Ok(format!(
+            fish_init_body!(),
+            tome_executable = tome_executable,
+            shell = &init_args.shell_type_or_path,
+            script_root = init_args.command_directory_path,
+            function_name = init_args.command_name,
+        )),
+        ShellType::BASH | ShellType::ZSH => Ok(format!(
+            bash_zsh_init_body!(),
+            tome_executable = tome_executable,
+            shell = &init_args.shell_type_or_path,
+            script_root = init_args.command_directory_path,
+            function_name = init_args.command_name,
+        )),
+        ShellType::UNKNOWN => Err(format!(
+            "could not determine shell from {}. Unable to init.",
+            &init_args.shell_type_or_path
+        )),
+    }
 }

@@ -62,7 +62,7 @@ impl Script {
                     // signifying continued help.
                     help_string.push_str(rest);
                 }
-            } else if line.starts_with("# COMPLETION") {
+            } else if line.starts_with("# COMPLETE") {
                 should_complete = true;
             } else if line.starts_with("# SOURCE") {
                 should_source = true;
