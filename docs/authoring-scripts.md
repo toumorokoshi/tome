@@ -12,11 +12,11 @@ This page covers some more advanced scenarios.
 
 ## Tab Completion by Script
 
-Tab completion for a script can improve the usability significantly. Tab completion can be turned on for a script by including a comment with the string "COMPLETION" in the top of the script:
+Tab completion for a script can improve the usability significantly. Tab completion can be turned on for a script by including a comment with the string "COMPLETE" in the top of the script:
 
 ```
 #!/usr/bin/env python
-# COMPLETION
+# COMPLETE
 ```
 
 When tab-completion is requested for a specific script, the script is invoked with the "--complete" argument passed at the end.
