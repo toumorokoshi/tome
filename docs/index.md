@@ -1,12 +1,16 @@
 # Introduction
 
 ## Quickstart
-- Download binary for platform from Releases
-- Add init command to your shell init: ie for zsh add to ~/.zshrc
+
+- Create a directory with all of your favorite scripts.
+- Download the binary for your platform of choice from the [releases](https://github.com/toumorokoshi/tome/releases).
+- Add init command to your shell init: ie for zsh add to ~/.zshrc:
 ```
 eval "$(tome init my-commands ~/my-scripts zsh)"
 ```
-- `my-commands --help`
+- spawn a new shell (or run the eval above) and try `my-commands help`
+
+You may want to shorten `my-commands` to something that is a lot easier to type, like a single character (e.g. `s` or `t`).
 
 ## What is Tome?
 
