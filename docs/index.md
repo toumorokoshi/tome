@@ -1,5 +1,7 @@
 # Tome
 
+Turn directories of shell scripts into full-blown CLIs.
+
 ![demo of tome](demo.gif)
 
 ## What is Tome?
