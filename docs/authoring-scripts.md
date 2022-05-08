@@ -39,6 +39,32 @@ If you want to write a script that modifies your current shell (e.g. navigate to
 
 You can see an example [in the examples folder](https://github.com/toumorokoshi/tome/blob/master/example/source_example) for more details.
 
+Source a script helps when you want to modify the state of your current shell, including:
+
+- setting environment variables.
+- navigate to a different directory.
+
 ## Ignoring scripts
 
 Files that lead with a `.` are ignored.
+
+## Adding help text
+
+Tome has the ability to read in help text for your script, giving you the ability
+to describe what the script is intended to do, and outputs that into commands such as `help`.
+
+To add help text, add as many lines as you like between lines with the strings `START HELP` and `END HELP`:
+
+```
+# START HELP
+# this script will navigate to your work script.
+# END HELP
+```
+
+## Adding a summary
+
+A summary can also be added, which will be printed out when you run `commands`:
+
+```
+# SUMMARY: this is a summary of my script
+```
