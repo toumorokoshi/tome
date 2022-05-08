@@ -1,6 +1,6 @@
 # Tome
 
-![demo of tome](docs/demo.gif)
+![demo of tome](demo.gif)
 
 ## What is Tome?
 
