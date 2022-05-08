@@ -42,6 +42,8 @@ And add in some features for discoverability:
 
 More documentation can be found at [readthedocs](https://tome-scripts.readthedocs.org/).
 
+Source code is on [GitHub](https://github.com/toumorokoshi/tome).
+
 ## Why?
 
 Everyone has their own way of sharing scripts with each other. In my experience it usually comes down to a git repo and prepending things to the path.

@@ -1,4 +1,5 @@
 site_name: Tome Documentation
+repo_url: https://github.com/toumorokoshi/tome
 # pip install mkdocs-material
 theme:
   name: material
