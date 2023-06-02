@@ -2,8 +2,7 @@
 
 ## What shells are supported?
 
-currently, bash and zsh are supported. PRs are welcome to support others!
-
+Currently, bash, fish and zsh are supported. PRs are welcome to support others!
 
 ## Why not Sub?
 
