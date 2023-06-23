@@ -57,13 +57,15 @@ complete -F _{function_name}_completions {function_name}
 macro_rules! fish_init_body {
     () => {
         r#"
+# Note: to perform debugging when interface for tome changes
+# set set -l fish_trace on before the buggy part of fish script
 function __fish_tome_help_message
   echo -e "--help\tPrint help\n"
 end
 
 function __fish_tome_complete_subcommands
-  # tome directory --complete completion
-  $argv[1] $argv[2] $argv[3] $argv[4..-1] | tr " " "\n"
+  # Arguments: tome command-complete ./example -s fish -- ARGS
+  $argv[1] $argv[2] $argv[3] $argv[4] $argv[5] $argv[6..-1] | tr " " "\n"
   return 0
 end
 
@@ -71,31 +73,44 @@ function __fish_tome_completion_inner
   set -l help_msg
   set -l tokens $argv
   switch (count $tokens)
-    case 0
-      # Being used as function in fish
-      __fish_tome_complete_subcommands $tokens
-      return 0
-    case 1
-      # only tome
-      # return all current directories
-      ls -d -1 */
-      __fish_tome_help_message
-      return 0
-    case 2
-      # tome ./directory
-      __fish_tome_help_message
-      echo -e "--complete\tCompletions\n"
-      return 0
-    case '*'
-      switch $tokens[3]
-        case "--complete"
-          __fish_tome_complete_subcommands $tokens
-          return 0
-        case '*'
-          echo "Unknown command state: $tokens" >&2
-          return 1
-      end
-      return 1
+  case 0
+    # Being used as function in fish
+    __fish_tome_complete_subcommands $tokens
+  case '*'
+    __fish_tome_complete_subcommands $tokens
+  end
+end
+
+function __fish_tome_completion_binary
+  set -l help_msg
+  set -l tokens $argv
+  switch (count $tokens)
+  case 0
+    echo "Bad codepath"
+    exit 1
+  case 1
+    # > tome
+    # needs commands
+    __fish_tome_help_message
+    echo -e "command-complete\tCompletions\n"
+    echo -e "command-execute\tExecute\n"
+    echo -e "help\tHelp\n"
+    echo -e "init\tInitialize Tome\n"
+  case 2
+    # > tome CMD
+    # return all current directories
+    ls -d -1 */
+    __fish_tome_help_message
+  case 3
+    echo -e "--shell\tShell\n"
+  case 4
+    echo -e "bash\tBash\n"
+    echo -e "zsh\tZsh\n"
+    echo -e "fish\tFish\n"
+  case 5
+    echo -e "--\tSeparator\n"
+  case '*'
+    __fish_tome_complete_subcommands $tokens
   end
 end
 
@@ -103,7 +118,7 @@ function __fish_tome_completion
   set -l args (commandline -co)
   switch $args[1]
     case 'tome'
-      __fish_tome_completion_inner $args
+      __fish_tome_completion_binary $args
     case '*'
       echo "Bad codepath"
       exit 1
