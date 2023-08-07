@@ -20,6 +20,7 @@ pub fn execute(
         if let Some(command) = BUILTIN_COMMANDS.get(command_name) {
             return (command.func)(command_directory_path, shell, args);
         }
+        Err(err) => Err(err),
     }
     // generic handling
     match finder::find_script(command_directory_path, args) {
