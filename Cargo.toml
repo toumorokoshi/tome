@@ -6,9 +6,8 @@ edition = "2018"
 license = "MIT"
 
 [dependencies]
-clap = { version = "3.0.7", features = ["derive"]}
+clap = { version = "3.0.7", features = ["derive"] }
 lazy_static = { version = "1.4.0" }
-
 
 
 [dev-dependencies]

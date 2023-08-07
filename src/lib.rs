@@ -6,6 +6,7 @@ extern crate lazy_static;
 pub mod cli;
 pub mod commands;
 pub mod directory;
+pub mod finder;
 pub mod script;
 pub mod shell_type;
 pub mod types;
@@ -39,6 +40,9 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
                 commands::help::help(&help_args.command_directory_path)
             }
             cli::TomeCommands::Init(init_args) => commands::init::init(&tome_executable, init_args),
+            cli::TomeCommands::Run(run_args) => {
+                commands::run::run(&run_args.command_directory_path, &run_args.args)
+            }
         },
         Err(msg) => Err(msg.to_string()),
     }
