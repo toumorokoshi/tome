@@ -2,7 +2,7 @@ on: [push]
 name: build-osx
 jobs:
   build:
-    runs-on: macos-10.15
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
