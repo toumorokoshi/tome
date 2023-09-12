@@ -43,7 +43,7 @@ if [ "$GOT" != "$WANT" ];
 end
 
 # test `TOME_SCRIPTS_ROOT`.
-set GOT $(e read-from-root)
+set GOT (e read-from-root)
 set WANT "data"
 if [ "$GOT" != "$WANT" ];
     echo "read-from-root failed; Got '$GOT', want '$WANT'"
