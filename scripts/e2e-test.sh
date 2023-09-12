@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# This script runs and end-to-end test to ensure that tome
+# This script runs an end-to-end test to ensure that tome
 # works for the shell and operating system used.
 #
 # Although bash is mentioned, this is designed to work with
@@ -41,10 +41,9 @@ if [ "${GOT}" != "${WANT}" ]; then
     echo "regular nested script failed; Got '${GOT}', want '${WANT}'"
 fi
 
-# test `tome run`, which cannot be tested in a
-# regular test due to it's usage of exec.
-GOT=$(./target/release/tome run ./example -- dir_example bar)
-WANT="bar"
+# test `TOME_SCRIPTS_ROOT`.
+GOT=$(e read-from-root)
+WANT="data"
 if [ "${GOT}" != "${WANT}" ]; then
-    echo "tome run nested script failed; Got '${GOT}', want '${WANT}'"
+    echo "read-from-root failed; Got '${GOT}', want '${WANT}'"
 fi

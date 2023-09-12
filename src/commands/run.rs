@@ -1,3 +1,4 @@
+use super::super::constants::SCRIPT_ROOT_ENVIRONMENT_VARIABLE;
 use super::super::finder;
 use std::os::unix::process::CommandExt;
 
@@ -10,6 +11,7 @@ pub fn run(command_directory_path: &str, args: &[String]) -> Result<String, Stri
         // successfully.
         Ok(script_invocation) => Err(std::process::Command::new(script_invocation.target)
             .args(script_invocation.args)
+            .env(SCRIPT_ROOT_ENVIRONMENT_VARIABLE, command_directory_path)
             .exec()
             .to_string()),
         Err(err) => Err(err),
