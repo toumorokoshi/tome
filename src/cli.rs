@@ -16,6 +16,11 @@ pub enum TomeCommands {
     CommandComplete(CompleteArgs),
     CommandExecute(ExecuteArgs),
     Init(InitArgs),
+    /// find a script and exec it.
+    /// run will not run the script in completion mode,
+    /// regardless of the script front matter. builtins such as
+    /// help are not accessible via this command
+    Run(RunArgs),
 }
 
 #[derive(Debug, Args)]
@@ -50,4 +55,11 @@ pub struct InitArgs {
     pub command_directory_path: String,
     /// The type of the shell to use, or the path to the shell executable being used.
     pub shell_type_or_path: String,
+}
+
+#[derive(Debug, Args)]
+pub struct RunArgs {
+    pub command_directory_path: String,
+    #[clap(last = true)]
+    pub args: Vec<String>,
 }
