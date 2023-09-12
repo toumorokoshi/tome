@@ -165,7 +165,7 @@ fn test_directory_completion() {
             "--",
             "dir_example",
         ])),
-        Ok("bar foo".to_string())
+        Ok("bar baz foo".to_string())
     );
 }
 
