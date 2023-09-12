@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# COMPLETE
+# showing a case of returnin deeper completes
+if [[ "$1" == "--complete" ]]; then
+    echo "--bar1 --bar2 --not-bar"
+    exit
+fi
+echo "COMMAND: baz $*"
