@@ -79,11 +79,11 @@ impl Script {
             }
         }
         Script {
-            help_string: help_string,
-            path: path,
-            should_complete: should_complete,
-            should_source: should_source,
-            summary_string: summary_string,
+            help_string,
+            path,
+            should_complete,
+            should_source,
+            summary_string,
         }
     }
 

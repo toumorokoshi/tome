@@ -20,8 +20,8 @@ pub fn help(root: &str) -> Result<String, String> {
     for (command, command_struct) in BUILTIN_COMMANDS.iter() {
         builtins_with_help.push(format!(
             "    {}: {}",
-            escape_slashes(&command),
-            escape_slashes(&command_struct.help_text),
+            escape_slashes(command),
+            escape_slashes(command_struct.help_text),
         ))
     }
 

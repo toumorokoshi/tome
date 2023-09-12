@@ -19,7 +19,7 @@ pub fn complete(
     let mut args_peekable = args.iter().peekable();
     // handle if the first command is a builtin
     if let Some(subcommand) = args_peekable.peek() {
-        if let Some(_) = BUILTIN_COMMANDS.get(*subcommand) {
+        if BUILTIN_COMMANDS.get(*subcommand).is_some() {
             return Ok(String::new());
         }
     }
@@ -77,7 +77,7 @@ pub fn complete(
         }
         TargetType::File => match script::Script::load(target.to_str().unwrap_or_default()) {
             Ok(script) => {
-                script.get_execution_body(CommandType::Completion, &shell, &remaining_args)
+                script.get_execution_body(CommandType::Completion, shell, &remaining_args)
             }
             Err(error) => return Err(format!("IOError loading file: {:?}", error)),
         },

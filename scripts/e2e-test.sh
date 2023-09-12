@@ -40,3 +40,11 @@ WANT="bar"
 if [ "${GOT}" != "${WANT}" ]; then
     echo "regular nested script failed; Got '${GOT}', want '${WANT}'"
 fi
+
+# test `tome run`, which cannot be tested in a
+# regular test due to it's usage of exec.
+GOT=$(./target/release/tome run ./example -- dir_example bar)
+WANT="bar"
+if [ "${GOT}" != "${WANT}" ]; then
+    echo "tome run nested script failed; Got '${GOT}', want '${WANT}'"
+fi
