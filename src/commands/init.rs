@@ -45,7 +45,7 @@ function _{function_name}_completions {{
     # strip the partial token_to_complete, if there is one
     tome_args=${{tome_args%$token_to_complete}};
     all_options=`{tome_executable} command-complete {script_root} -s {shell} -- $tome_args`
-    valid_options=$(compgen -W "$all_options" "$token_to_complete")
+    valid_options=$(compgen -W "$all_options" -- "$token_to_complete")
     COMPREPLY=($valid_options)
 }}
 
