@@ -41,3 +41,10 @@ set WANT "bar"
 if [ "$GOT" != "$WANT" ];
     echo "regular nested script failed; Got '$GOT', want '$WANT'"
 end
+
+# test `TOME_SCRIPTS_ROOT`.
+set GOT (e read-from-root)
+set WANT "data"
+if [ "$GOT" != "$WANT" ];
+    echo "read-from-root failed; Got '$GOT', want '$WANT'"
+end

@@ -175,7 +175,7 @@ fn test_root_directory_completion() {
     assert_eq!(
         execute(_vec_str(vec!["tome", "command-complete", "-s", "bash", EXAMPLE_DIR])),
         // note that we also complete with builtins
-        Ok("commands dir_example exec file_example help practical_examples source_example source_example_fish test_files tome use-arg".to_string())
+        Ok("commands dir_example exec file_example help practical_examples read-from-root source_example source_example_fish test_files tome use-arg".to_string())
     );
 }
 

@@ -1,5 +1,6 @@
 use super::super::{
     cli::InitArgs,
+    constants::SCRIPT_ROOT_ENVIRONMENT_VARIABLE,
     shell_type::{get_shell_type, ShellType},
 };
 
@@ -32,6 +33,7 @@ fi
 # 2. filtering for valid options using compgen
 # 3. appending to the valid option environment variable.
 function {function_name} {{
+    export {script_root_environment_variable}="{script_root}"
     # capturing the results as a variable led to the command
     # being to long for zsh to execute. (literally raising
     # "command too long" )
@@ -39,6 +41,7 @@ function {function_name} {{
 }}
 
 function _{function_name}_completions {{
+    export {script_root_environment_variable}="{script_root}"
     local token_to_complete tome_args
     token_to_complete="${{COMP_WORDS[COMP_CWORD]}}";
     tome_args=${{COMP_WORDS[@]:1}};  # strip the first argument prefix, which is the function name
@@ -116,6 +119,7 @@ end
 
 function __fish_tome_completion
   set -l args (commandline -co)
+  set -x {script_root_environment_variable} "{script_root}"
   switch $args[1]
     case 'tome'
       __fish_tome_completion_binary $args
@@ -138,6 +142,7 @@ complete -c tome -f -a "(__fish_tome_completion)"
 
 # Alias for tome command
 function {function_name}
+  set -x {script_root_environment_variable} "{script_root}"
   eval ({tome_executable} command-execute {script_root} -s {shell} -- $argv)
 end
 complete -c {function_name} -f -a "(__fish_tome_completion_fn {script_root} $argv)"
@@ -165,6 +170,7 @@ pub fn init(tome_executable: &str, init_args: &InitArgs) -> Result<String, Strin
             shell = &init_args.shell_type_or_path,
             script_root = init_args.command_directory_path,
             function_name = init_args.command_name,
+            script_root_environment_variable = SCRIPT_ROOT_ENVIRONMENT_VARIABLE,
         )),
         ShellType::BASH | ShellType::ZSH => Ok(format!(
             bash_zsh_init_body!(),
@@ -172,6 +178,7 @@ pub fn init(tome_executable: &str, init_args: &InitArgs) -> Result<String, Strin
             shell = &init_args.shell_type_or_path,
             script_root = init_args.command_directory_path,
             function_name = init_args.command_name,
+            script_root_environment_variable = SCRIPT_ROOT_ENVIRONMENT_VARIABLE,
         )),
         ShellType::UNKNOWN => Err(format!(
             "could not determine shell from {}. Unable to init.",

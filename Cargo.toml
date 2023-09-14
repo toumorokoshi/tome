@@ -9,6 +9,5 @@ license = "MIT"
 clap = { version = "3.0.7", features = ["derive"] }
 lazy_static = { version = "1.4.0" }
 
-
 [dev-dependencies]
 rstest = "0.12.0"

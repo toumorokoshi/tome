@@ -68,3 +68,11 @@ A summary can also be added, which will be printed out when you run `commands`:
 ```
 # SUMMARY: this is a summary of my script
 ```
+
+## Locating files relative to the scripts directory
+
+A `_TOME_SCRIPTS_ROOT` environment variable, which points to the root directory
+of the scripts,  is provided to help find files that are stored inside (e.g.
+depenendencies of other scripts).
+
+This variable can be used safely in your scripts.

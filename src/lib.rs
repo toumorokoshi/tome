@@ -5,6 +5,7 @@ extern crate lazy_static;
 
 pub mod cli;
 pub mod commands;
+pub mod constants;
 pub mod directory;
 pub mod finder;
 pub mod script;
