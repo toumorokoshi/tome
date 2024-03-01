@@ -12,7 +12,7 @@ env:
   # Rust build arguments
   BUILD_ARGS: "--release --all-features"
   # The binary name
-  BIN_NAME: "example"
+  BIN_NAME: "tome"
   # Docker token required to pull images from DockerHub
   DOCKER_LOGIN: ${{ secrets.DOCKER_LOGIN }}
   DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
