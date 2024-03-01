@@ -1,24 +1,25 @@
+# Credit: https://www.qovery.com/blog/how-to-make-rust-multi-arch-release-easy/
 project_name: tome
 
-before:
-  hooks:
-  - curl https://gist.githubusercontent.com/zph/032671320bb222b43719c2879f1b9f12/raw/56f1c78834c313e5c2f107a76bbed1c6cc510f8e/goreleaser.go > goreleaser.go
+# before:
+#   hooks:
+#   - curl https://gist.githubusercontent.com/zph/032671320bb222b43719c2879f1b9f12/raw/56f1c78834c313e5c2f107a76bbed1c6cc510f8e/goreleaser.go > goreleaser.go
 builds:
   - main: goreleaser.go
+    goos:
+      - linux
+      - darwin
+      - windows
     goarch:
       - amd64
-    binary: tome
+      - arm64
+    binary: example
+    ignore:
+      - goos: windows
+        goarch: arm64
     hooks:
       post:
-        - sh scripts/build-cross-release.sh
-        - rm -f goreleaser.go
-archives:
-  #   - replacements:
-  #       darwin: Darwin
-  #       linux: Linux
-  #       windows: Windows
-  #       386: i386
-  #       amd64: x86_64
+        - ./scripts/goreleaser_hook.sh {{ .Arch }} {{ .Os }} {{ .ProjectName }}
 checksum:
   name_template: 'checksums.txt'
 snapshot:

@@ -24,15 +24,15 @@ jobs:
           zsh scripts/e2e-test.sh zsh
           echo "testing run"
           zsh scripts/e2e-test-run.sh
-      - name: build-release
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          cargo build --release
-          cp ./target/release/tome ./target/release/tome-osx
-      - name: release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: ./target/release/tome-osx
-          token: ${{ secrets.GITHUB_TOKEN }}
-          draft: true
+      # - name: build-release
+      #   if: startsWith(github.ref, 'refs/tags/')
+      #   run: |
+      #     cargo build --release
+      #     cp ./target/release/tome ./target/release/tome-osx
+      # - name: release
+      #   uses: softprops/action-gh-release@v1
+      #   if: startsWith(github.ref, 'refs/tags/')
+      #   with:
+      #     files: ./target/release/tome-osx
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     draft: true
