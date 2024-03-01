@@ -26,3 +26,18 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+
+brews:
+  - name: tome
+    goarm: 6
+    tap:
+      owner: zph
+      name: tome
+    url_template: "https://github.com/zph/tome/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    commit_author:
+      name: Zander Hill
+      email: elegant.sock3832@xargs.io
+    folder: pkg/brew
+    homepage: "https://github.com/zph/tome"
+    description: "CLI Wrapper Tool for Turning a Folder of Scripts into an SDK"
+    skip_upload: false
