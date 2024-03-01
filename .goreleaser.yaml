@@ -4,7 +4,7 @@ before:
   hooks:
   - curl https://gist.githubusercontent.com/zph/032671320bb222b43719c2879f1b9f12/raw/56f1c78834c313e5c2f107a76bbed1c6cc510f8e/goreleaser.go > goreleaser.go
 builds:
-  - main: dummy.go
+  - main: goreleaser.go
     goarch:
       - amd64
     binary: tome
@@ -13,12 +13,12 @@ builds:
         - sh scripts/build-cross-release.sh
         - rm -f goreleaser.go
 archives:
-  - replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
+  #   - replacements:
+  #       darwin: Darwin
+  #       linux: Linux
+  #       windows: Windows
+  #       386: i386
+  #       amd64: x86_64
 checksum:
   name_template: 'checksums.txt'
 snapshot:
