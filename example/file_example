@@ -12,7 +12,7 @@
 # $ cb file_example foo a --complete
 # will pass all arguments (the "a" should be autocompleted.)
 if [ "${1}" == "--complete" ]; then
-    echo "file autocomplete example"
+    echo -n "file autocomplete example"
 else
     echo "hello"
 fi
