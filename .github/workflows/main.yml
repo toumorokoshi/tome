@@ -39,6 +39,9 @@ jobs:
             target: aarch64-apple-darwin
             bin: tome
             name: tome-darwin-aarch64
+            # The action does not support running tests on aarch64-apple-darwin.
+            # https://github.com/houseabsolute/actions-rust-cross?tab=readme-ov-file#input-parameters
+            skip_tests: true
         toolchain:
           - stable
           - beta
