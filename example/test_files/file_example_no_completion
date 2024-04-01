@@ -1,11 +1,10 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python3
 # SUMMARY: hey'
 # START HELP
 # this is an example of a simple script written in python.
 # but does not support completion, so tome should not
 # try to invoke completion
 # END HELP
-# import sys
-#
-# print("hello")
-echo "hello"
+import sys
+
+print("hello")

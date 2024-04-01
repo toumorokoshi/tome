@@ -1,17 +1,23 @@
-#!/usr/bin/env python
+#!/usr/bin/env bash
 # SUMMARY: hey'
 # COMPLETE
 # START HELP
 # this is an example of a simple script written in python.
 # END HELP
-import sys
+#import sys
 
 # when attempting to complete a variable,
 # --complete will be passed, with the full argument set.
 # for example,
 # $ cb file_example foo a --complete
 # will pass all arguments (the "a" should be autocompleted.)
-if len(sys.argv) > 1 and sys.argv[1] == "--complete":
-    sys.stdout.write("file autocomplete example")
-else:
-    print("hello")
+if [ "${1}" == "--complete" ]; then
+    echo "file autocomplete example"
+else
+    echo "hello"
+fi
+
+#if len(sys.argv) > 1 and sys.argv[1] == "--complete":
+#    sys.stdout.write("file autocomplete example")
+#else:
+#    print("hello")
