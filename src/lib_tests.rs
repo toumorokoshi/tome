@@ -99,7 +99,7 @@ fn test_simple_script_completion() {
 }
 
 /// Unless the file has the completion annotation
-/// do not invoked completion on it and return nothing
+/// do not invoke completion on it and return nothing
 /// instead.
 #[test]
 fn test_simple_script_no_completion() {

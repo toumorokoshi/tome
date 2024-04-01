@@ -1,0 +1,68 @@
+name: Build and Release
+on:
+  # # Indicates I want to run this workflow on all branches, PR, and tags
+  push:
+    branches: ["*"]
+    tags: ["*"]
+  pull_request:
+    branches: ["master"]
+
+env:
+  BIN_NAME: "tome"
+  CRATE_NAME: tome
+
+jobs:
+  build:
+    name: ${{ matrix.platform.os_name }} with rust ${{ matrix.toolchain }}
+    runs-on: ${{ matrix.platform.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - os_name: Linux-x86_64
+            os: ubuntu-20.04
+            target: x86_64-unknown-linux-musl
+            bin: tome
+            name: tome-linux-x86_64
+          - os_name: Linux-aarch64
+            os: ubuntu-20.04
+            target: aarch64-unknown-linux-musl
+            bin: tome
+            name: tome-linux-aarch64
+          - os_name: macOS-x86_64
+            os: macOS-latest
+            target: x86_64-apple-darwin
+            bin: tome
+            name: tome-darwin-x86_64
+          - os_name: macOS-aarch64
+            os: macOS-latest
+            target: aarch64-apple-darwin
+            bin: tome
+            name: tome-darwin-aarch64
+            # The action does not support running tests on aarch64-apple-darwin.
+            # https://github.com/houseabsolute/actions-rust-cross?tab=readme-ov-file#input-parameters
+            skip_tests: true
+        toolchain:
+          - stable
+          - beta
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install musl-tools on Linux
+        run: sudo apt-get update --yes && sudo apt-get install --yes musl-tools
+        if: contains(matrix.platform.name, 'musl')
+      - name: Build binary
+        uses: houseabsolute/actions-rust-cross@v0.0.12
+        with:
+          command: "build"
+          target: ${{ matrix.platform.target }}
+          toolchain: ${{ matrix.toolchain }}
+          args: "--locked --release"
+          strip: true
+      - name: Run tests
+        uses: houseabsolute/actions-rust-cross@v0
+        with:
+          command: "test"
+          target: ${{ matrix.platform.target }}
+          toolchain: ${{ matrix.toolchain }}
+          args: "--locked --release"
+        if: ${{ !matrix.platform.skip_tests }}
