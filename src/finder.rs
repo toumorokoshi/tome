@@ -20,6 +20,9 @@ pub fn find_script<'a>(
     let mut args_peekable = args.iter().peekable();
     // generic handling
     while let Some(arg) = args_peekable.peek() {
+        if arg.is_empty() {
+            break;
+        }
         target.push(arg);
         if target.is_file() {
             target_type = TargetType::File;
