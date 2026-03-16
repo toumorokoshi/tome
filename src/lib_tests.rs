@@ -131,7 +131,7 @@ fn test_source() {
             "--",
             "source_example",
         ])),
-        Ok(format!("'.' '{}/source_example' ''", EXAMPLE_DIR))
+        Ok(format!("'.' '{}/source_example'", EXAMPLE_DIR))
     );
 }
 
@@ -274,7 +274,7 @@ fn test_use_arg() {
             "--",
             "use-arg"
         ])),
-        Ok(format!("'.' '{}/use-arg' ''", EXAMPLE_DIR))
+        Ok(format!("'.' '{}/use-arg'", EXAMPLE_DIR))
     );
 }
 
@@ -292,7 +292,7 @@ fn test_dangerous_characters_quoted() {
             "--",
             "use-arg"
         ])),
-        Ok(format!("'.' '{}/use-arg' ''", EXAMPLE_DIR))
+        Ok(format!("'.' '{}/use-arg'", EXAMPLE_DIR))
     );
 }
 
@@ -350,6 +350,61 @@ fn test_help_page_when_execute_no_args() {
     ]))
     .unwrap();
     assert_is_help_text(&result)
+}
+
+/// if an empty argument is passed in the middle of a path, it should
+/// be treated as an argument to the script, rather than a no-op
+/// directory.
+#[test]
+fn test_empty_arg_in_middle_of_path() {
+    assert_eq!(
+        execute(_vec_str(vec![
+            "tome",
+            "command-execute",
+            "-s",
+            "bash",
+            EXAMPLE_DIR,
+            "--",
+            "",
+            "file_example"
+        ])),
+        Err(format!(
+            "command  not found in directory {}",
+            EXAMPLE_DIR
+        ))
+    );
+}
+
+/// sourced scripts should be able to distinguish between zero args and one empty arg.
+#[test]
+fn test_source_arg_count() {
+    // Zero args
+    assert_eq!(
+        execute(_vec_str(vec![
+            "tome",
+            "command-execute",
+            "-s",
+            "bash",
+            EXAMPLE_DIR,
+            "--",
+            "source_example",
+        ])),
+        Ok(format!("'.' '{}/source_example'", EXAMPLE_DIR))
+    );
+    // One empty arg
+    assert_eq!(
+        execute(_vec_str(vec![
+            "tome",
+            "command-execute",
+            "-s",
+            "bash",
+            EXAMPLE_DIR,
+            "--",
+            "source_example",
+            ""
+        ])),
+        Ok(format!("'.' '{}/source_example' ''", EXAMPLE_DIR))
+    );
 }
 
 // helper function to assert that the output

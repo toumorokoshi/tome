@@ -37,17 +37,17 @@ function {function_name} {{
     # capturing the results as a variable led to the command
     # being to long for zsh to execute. (literally raising
     # "command too long" )
-    eval `{tome_executable} command-execute {script_root} -s {shell} -- $@`
+    eval `{tome_executable} command-execute {script_root} -s {shell} -- "$@"`
 }}
 
 function _{function_name}_completions {{
     export {script_root_environment_variable}="{script_root}"
     local token_to_complete tome_args
     token_to_complete="${{COMP_WORDS[COMP_CWORD]}}";
-    tome_args=${{COMP_WORDS[@]:1}};  # strip the first argument prefix, which is the function name
+    tome_args="${{COMP_WORDS[@]:1}}";  # strip the first argument prefix, which is the function name
     # strip the partial token_to_complete, if there is one
-    tome_args=${{tome_args%$token_to_complete}};
-    all_options=`{tome_executable} command-complete {script_root} -s {shell} -- $tome_args`
+    tome_args="${{tome_args%$token_to_complete}}";
+    all_options=`{tome_executable} command-complete {script_root} -s {shell} -- "$tome_args"`
     valid_options=$(compgen -W "$all_options" -- "$token_to_complete")
     COMPREPLY=($valid_options)
 }}

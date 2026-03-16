@@ -132,12 +132,6 @@ impl Script {
                     for arg in args.iter() {
                         command.push((**arg).clone());
                     }
-                    // in the case of sourcing, at least one variable needs
-                    // to be specified, or else arguments will be inherited
-                    // from the parent process.
-                    if command.len() == 2 {
-                        command.push(String::from(""));
-                    }
                     command
                 } else {
                     let mut command = vec![self.path.clone()];
