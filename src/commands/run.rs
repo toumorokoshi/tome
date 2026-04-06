@@ -1,19 +1,20 @@
 use super::super::constants::SCRIPT_ROOT_ENVIRONMENT_VARIABLE;
-use super::super::finder;
+use super::super::finder::{self, FindResult};
 use std::os::unix::process::CommandExt;
 
 pub fn run(command_directory_path: &str, args: &[String]) -> Result<String, String> {
-    // generic handling
     match finder::find_script(command_directory_path, args) {
-        // although both paths will always error, the Ok() path actually will
-        // likely complete as expected, as an exec effectively transforms the
-        // existing process into the new command, which may complete
-        // successfully.
-        Ok(script_invocation) => Err(std::process::Command::new(script_invocation.target)
-            .args(script_invocation.args)
-            .env(SCRIPT_ROOT_ENVIRONMENT_VARIABLE, command_directory_path)
-            .exec()
-            .to_string()),
+        Ok(FindResult::File(invocation)) => {
+            Err(std::process::Command::new(invocation.target)
+                .args(invocation.args)
+                .env(SCRIPT_ROOT_ENVIRONMENT_VARIABLE, command_directory_path)
+                .exec()
+                .to_string())
+        }
+        Ok(FindResult::Directory(path)) => Err(format!(
+            "{} is a directory. tab-complete to choose subcommands",
+            path.to_str().unwrap_or("")
+        )),
         Err(err) => Err(err),
     }
 }
