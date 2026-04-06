@@ -38,7 +38,7 @@ pub fn execute(raw_args: Vec<String>) -> Result<String, String> {
                 &execute_args.args,
             ),
             cli::TomeCommands::CommandHelp(help_args) => {
-                commands::help::help(&help_args.command_directory_path)
+                commands::help::help(&help_args.command_directory_path, &help_args.args)
             }
             cli::TomeCommands::Init(init_args) => commands::init::init(&tome_executable, init_args),
             cli::TomeCommands::Run(run_args) => {

@@ -46,8 +46,8 @@ fn exec_command(root: &str, shell: &str, args: &[String]) -> Result<String, Stri
     execute(root, shell, &args[1..])
 }
 
-fn help_command(root: &str, _: &str, _: &[String]) -> Result<String, String> {
-    help(root)
+fn help_command(root: &str, _: &str, args: &[String]) -> Result<String, String> {
+    help(root, args.get(1..).unwrap_or(&[]))
 }
 
 fn noop_command(_: &str, _: &str, _: &[String]) -> Result<String, String> {

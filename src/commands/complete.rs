@@ -1,6 +1,6 @@
 use super::super::{
     directory, script,
-    types::{CommandType, TargetType},
+    types::CommandType,
 };
 use super::builtins::BUILTIN_COMMANDS;
 use std::{fs, io, path::PathBuf};
@@ -10,14 +10,9 @@ pub fn complete(
     shell: &str,
     args: &[String],
 ) -> Result<String, String> {
-    // TODO: refactor to share common logic with execute
-    // determine if a file or a directory was passed,
-    // recursing down arguments until we've exhausted arguments
-    // that match a directory or file.
     let mut target = PathBuf::from(&command_directory_path);
-    let mut target_type = TargetType::Directory;
+    let mut is_file = false;
     let mut args_peekable = args.iter().peekable();
-    // handle if the first command is a builtin
     if let Some(subcommand) = args_peekable.peek() {
         if BUILTIN_COMMANDS.get(*subcommand).is_some() {
             return Ok(String::new());
@@ -26,23 +21,19 @@ pub fn complete(
     while let Some(arg) = args_peekable.peek() {
         target.push(arg);
         if target.is_file() {
-            target_type = TargetType::File;
+            is_file = true;
             args_peekable.next();
             break;
         } else if target.is_dir() {
-            target_type = TargetType::Directory;
             args_peekable.next();
         } else {
-            // the current argument does not match
-            // a directory or a file, so we've landed
-            // on the strictest match.
             target.pop();
             break;
         }
     }
     let remaining_args: Vec<_> = args_peekable.collect();
-    return match target_type {
-        TargetType::Directory => {
+    return match is_file {
+        false => {
             let paths_raw: io::Result<_> = fs::read_dir(target.to_str().unwrap());
             let mut paths: Vec<_> = match paths_raw {
                 Err(_a) => return Err("Invalid argument to completion".to_string()),
@@ -66,7 +57,6 @@ pub fn complete(
                 Err(_) => None,
             })
             .collect();
-            // if this is the root directory, add the builtin commands
             if target.to_str().unwrap() == command_directory_path {
                 for command in BUILTIN_COMMANDS.keys() {
                     paths.push(command.to_owned());
@@ -75,7 +65,7 @@ pub fn complete(
             paths.sort_by_key(|f| f.to_owned());
             Ok(paths.join(" "))
         }
-        TargetType::File => match script::Script::load(target.to_str().unwrap_or_default()) {
+        true => match script::Script::load(target.to_str().unwrap_or_default()) {
             Ok(script) => {
                 script.get_execution_body(CommandType::Completion, shell, &remaining_args)
             }
