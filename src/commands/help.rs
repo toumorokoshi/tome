@@ -9,9 +9,11 @@ macro_rules! help_template {
         r#"echo -e
 'This is an instance of tome, running against the directory {}.
 \nThe commands are namespaced by the directory structure.
-\nBuiltin commands available to all instance of tome are:
-\n    {}
+\n
 \n{}commands available are:
+\n    {}
+\n
+\nBuiltin commands available to all instance of tome are:
 \n    {}
 ';"#
     };
@@ -24,7 +26,7 @@ pub fn help(root: &str, args: &[String]) -> Result<String, String> {
     match finder::find_script(root, args) {
         Ok(FindResult::File(invocation)) => {
             let script = Script::load(invocation.target.to_str().unwrap_or_default())
-                .map_err(|e| format!("IOError loading file: {:?}", e))?;
+                .map_err(|e| echo_error(&format!("IOError loading file: {:?}", e)))?;
             Ok(help_for_script(&invocation.target, &script))
         }
         Ok(FindResult::Directory(path)) => {
@@ -32,8 +34,12 @@ pub fn help(root: &str, args: &[String]) -> Result<String, String> {
             let scope_label = args.join(" ");
             help_all_in_dir(root, dir_str, &format!("The list of {} ", scope_label))
         }
-        Err(err) => Err(err),
+        Err(err) => Ok(echo_error(&err)),
     }
+}
+
+fn echo_error(msg: &str) -> String {
+    format!("echo '{}' >&2", escape_slashes(msg))
 }
 
 fn help_for_script(path: &PathBuf, script: &Script) -> String {
@@ -67,8 +73,8 @@ fn help_all_in_dir(root: &str, dir: &str, list_label: &str) -> Result<String, St
         })
         .collect();
 
-    let commands_and_scripts = scan_directory(dir, &mut vec![])
-        .map_err(|e| format!("{}", e))?;
+    let commands_and_scripts =
+        scan_directory(dir, &mut vec![]).map_err(|e| echo_error(&format!("{}", e)))?;
     let commands_with_help: Vec<_> = commands_and_scripts
         .iter()
         .map(|(command, script)| {
@@ -83,9 +89,9 @@ fn help_all_in_dir(root: &str, dir: &str, list_label: &str) -> Result<String, St
     Ok(format!(
         help_template!(),
         root,
-        builtins_with_help.join("\\n"),
-        list_label,
         commands_with_help.join("\\n"),
+        list_label,
+        builtins_with_help.join("\\n"),
     ))
 }
 

@@ -475,3 +475,21 @@ fn test_help_for_directory() {
     assert!(result.contains("bar"));
 }
 
+/// help for an unknown command must return eval-safe output (wrapped in echo)
+/// so the shell function does not misinterpret the error string as a command.
+#[test]
+fn test_help_unknown_command_is_eval_safe() {
+    let result = execute(_vec_str(vec![
+        "tome",
+        "command-execute",
+        "-s",
+        "bash",
+        EXAMPLE_DIR,
+        "--",
+        "help",
+        "nonexistent_command",
+    ]))
+    .unwrap();
+    assert!(result.starts_with("echo '"), "expected echo-wrapped output, got: {}", result);
+    assert!(result.contains(">&2"));
+}
