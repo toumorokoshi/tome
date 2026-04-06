@@ -45,6 +45,8 @@ pub struct ExecuteArgs {
 #[derive(Debug, Args)]
 pub struct HelpArgs {
     pub command_directory_path: String,
+    #[clap(last = true)]
+    pub args: Vec<String>,
 }
 
 #[derive(Debug, Args)]

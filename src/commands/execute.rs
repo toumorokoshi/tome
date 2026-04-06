@@ -12,7 +12,7 @@ pub fn execute(
     let mut args_peekable = args.iter().peekable();
     // if no argument is passed, return help.
     if args_peekable.peek().is_none() {
-        return help::help(command_directory_path);
+        return help::help(command_directory_path, &[]);
     }
     // special handling for root subcommmand for reserved
     // commands

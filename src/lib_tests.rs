@@ -421,3 +421,57 @@ fn assert_is_help_text(result: &str) {
     assert!(result.contains("help:"));
     assert!(result.contains("tome:"));
 }
+
+/// help for a specific script should print its summary and help text.
+#[test]
+fn test_help_for_script() {
+    let result = execute(_vec_str(vec![
+        "tome",
+        "command-execute",
+        "-s",
+        "bash",
+        EXAMPLE_DIR,
+        "--",
+        "help",
+        "file_example",
+    ]))
+    .unwrap();
+    assert!(result.contains("file_example"));
+    assert!(result.contains("hey"));
+    assert!(result.contains("this is an example of a simple script"));
+}
+
+/// help for a script via command-help should also print script-specific text.
+#[test]
+fn test_help_page_for_script() {
+    let result = execute(_vec_str(vec![
+        "tome",
+        "command-help",
+        EXAMPLE_DIR,
+        "--",
+        "file_example",
+    ]))
+    .unwrap();
+    assert!(result.contains("file_example"));
+    assert!(result.contains("hey"));
+    assert!(result.contains("this is an example of a simple script"));
+}
+
+/// help for a directory prefix should list only commands in that directory.
+#[test]
+fn test_help_for_directory() {
+    let result = execute(_vec_str(vec![
+        "tome",
+        "command-execute",
+        "-s",
+        "bash",
+        EXAMPLE_DIR,
+        "--",
+        "help",
+        "dir_example",
+    ]))
+    .unwrap();
+    assert!(result.contains("foo"));
+    assert!(result.contains("bar"));
+}
+
