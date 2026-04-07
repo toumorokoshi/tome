@@ -1,8 +1,8 @@
 # Basic Scripts
 
-> **Note:** This document pertains to tome 2.0. Historically, tome has not
+> **Note:** This document pertains to tome 0.11. Historically, tome has not
 > required the executable bit — any file in the scripts directory was
-> recognized as a command. Starting with tome 2.0, only files with the
+> recognized as a command. Starting with tome 0.12, only files with the
 > executable bit set are recognized. If you are migrating from an earlier
 > version, ensure your scripts are marked executable (`chmod +x <script>`).
 > Additionally, the `# SOURCE` comment header for marking sourceable scripts
@@ -106,7 +106,7 @@ A summary can also be added, which will be printed out when you run `commands`:
 ## Locating files relative to the scripts directory
 
 A `_TOME_SCRIPTS_ROOT` environment variable, which points to the root directory
-of the scripts,  is provided to help find files that are stored inside (e.g.
+of the scripts, is provided to help find files that are stored inside (e.g.
 depenendencies of other scripts).
 
 This variable can be used safely in your scripts.
