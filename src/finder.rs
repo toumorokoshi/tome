@@ -1,3 +1,4 @@
+use super::script;
 use std::path::PathBuf;
 
 pub struct ScriptInvocation<'a> {
@@ -21,7 +22,8 @@ pub fn find_script<'a>(
             break;
         }
         target.push(arg);
-        if target.is_file() {
+        if let Some(resolved) = script::resolve_source_path(&target) {
+            target = resolved;
             args_peekable.next();
             let remaining_args: Vec<_> = args_peekable.collect();
             return Ok(FindResult::File(ScriptInvocation {
