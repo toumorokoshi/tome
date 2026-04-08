@@ -118,7 +118,8 @@ fn test_simple_script_no_completion() {
     );
 }
 
-/// basic test for a script that should be sourced
+/// basic test for a script that should be sourced.
+/// .source files are sourced when executed
 #[test]
 fn test_source() {
     assert_eq!(
@@ -131,7 +132,7 @@ fn test_source() {
             "--",
             "source_example",
         ])),
-        Ok(format!("'.' '{}/source_example'", EXAMPLE_DIR))
+        Ok(format!("'.' '{}/source_example.source'", EXAMPLE_DIR))
     );
 }
 
@@ -169,7 +170,8 @@ fn test_directory_completion() {
     );
 }
 
-/// the root directory should also be completed
+/// the root directory should also be completed.
+/// non-executable files should not appear in completions
 #[test]
 fn test_root_directory_completion() {
     assert_eq!(
@@ -274,7 +276,7 @@ fn test_use_arg() {
             "--",
             "use-arg"
         ])),
-        Ok(format!("'.' '{}/use-arg'", EXAMPLE_DIR))
+        Ok(format!("'.' '{}/use-arg.source'", EXAMPLE_DIR))
     );
 }
 
@@ -292,7 +294,7 @@ fn test_dangerous_characters_quoted() {
             "--",
             "use-arg"
         ])),
-        Ok(format!("'.' '{}/use-arg'", EXAMPLE_DIR))
+        Ok(format!("'.' '{}/use-arg.source'", EXAMPLE_DIR))
     );
 }
 
@@ -389,7 +391,7 @@ fn test_source_arg_count() {
             "--",
             "source_example",
         ])),
-        Ok(format!("'.' '{}/source_example'", EXAMPLE_DIR))
+        Ok(format!("'.' '{}/source_example.source'", EXAMPLE_DIR))
     );
     // One empty arg
     assert_eq!(
@@ -403,7 +405,7 @@ fn test_source_arg_count() {
             "source_example",
             ""
         ])),
-        Ok(format!("'.' '{}/source_example' ''", EXAMPLE_DIR))
+        Ok(format!("'.' '{}/source_example.source' ''", EXAMPLE_DIR))
     );
 }
 
@@ -412,7 +414,7 @@ fn test_source_arg_count() {
 fn assert_is_help_text(result: &str) {
     // uncomment to see output
     // println!("{}", result);
-    assert_eq!(result.matches("'\\''").count(), 2);
+    assert_eq!(result.matches("'\\'").count(), 2);
     assert_eq!(result.matches("'").count(), 8);
     assert!(result.contains("echo -e"));
     // verify that builtin tome commands are present

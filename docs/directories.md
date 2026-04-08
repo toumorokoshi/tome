@@ -9,10 +9,13 @@ For example, a file "foo" in a directory "dir" can be called as:
 
 ## Ignoring Directories
 
-Directories can be ignored by adding a .tomeignore file in the directory.
+Directories can be ignored by either:
+
+- Adding a `.tomeignore` file in the directory.
+- Naming the directory with a `.` prefix (e.g. `.hidden-dir`).
 
 ## Tab completion of Directories
 
 If one attempts to tab complete a directory, all valid tome scripts and 
-subdirectories will be valid options.
-
+subdirectories will be valid options. Non-executable files and ignored
+directories are excluded from completion results.

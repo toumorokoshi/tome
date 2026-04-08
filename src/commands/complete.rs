@@ -20,7 +20,8 @@ pub fn complete(
     }
     while let Some(arg) = args_peekable.peek() {
         target.push(arg);
-        if target.is_file() {
+        if let Some(resolved) = script::resolve_source_path(&target) {
+            target = resolved;
             is_file = true;
             args_peekable.next();
             break;
@@ -45,14 +46,11 @@ pub fn complete(
                     if path.is_dir() && !directory::is_tome_script_directory(&path) {
                         return None;
                     }
-                    if path.is_file()
-                        && !script::is_tome_script(
-                            path_buf.file_name().to_str().unwrap_or_default(),
-                        )
-                    {
+                    if path.is_file() && !script::is_tome_script(&path) {
                         return None;
                     }
-                    Some(path.file_name().unwrap().to_str().unwrap_or("").to_owned())
+                    let name = path.file_name().unwrap().to_str().unwrap_or("").to_owned();
+                    Some(script::strip_source_suffix(&name).to_owned())
                 }
                 Err(_) => None,
             })

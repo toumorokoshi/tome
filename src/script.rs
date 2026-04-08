@@ -1,15 +1,61 @@
-// used to determine if the file is a valid script or not
-pub fn is_tome_script(filename: &str) -> bool {
-    !filename.starts_with('.')
-}
-
-use super::types::CommandType;
 use std::{
     fs::File,
     io,
     io::{prelude::*, BufReader, Read},
+    os::unix::fs::PermissionsExt,
+    path::Path,
     process::{Command, Stdio},
 };
+
+use super::types::CommandType;
+
+const SOURCE_EXTENSION: &str = "source";
+
+// used to determine if the file is a valid script or not
+pub fn is_tome_script(path: &Path) -> bool {
+    let filename = path
+        .file_name()
+        .unwrap_or_default()
+        .to_str()
+        .unwrap_or_default();
+    if filename.starts_with('.') {
+        return false;
+    }
+    if is_source_file(filename) {
+        return true;
+    }
+    is_executable(path)
+}
+
+pub fn is_source_file(filename: &str) -> bool {
+    Path::new(filename)
+        .extension()
+        .map_or(false, |ext| ext == SOURCE_EXTENSION)
+}
+
+fn is_executable(path: &Path) -> bool {
+    path.metadata()
+        .map(|m| m.permissions().mode() & 0o111 != 0)
+        .unwrap_or(false)
+}
+
+pub fn strip_source_suffix(name: &str) -> &str {
+    name.strip_suffix(".source").unwrap_or(name)
+}
+
+/// Try to resolve a path that may have a `.source` extension on disk.
+/// Returns the resolved path if found, or None.
+pub fn resolve_source_path(path: &Path) -> Option<std::path::PathBuf> {
+    if path.is_file() {
+        return Some(path.to_path_buf());
+    }
+    let source_path = path.with_extension(SOURCE_EXTENSION);
+    if source_path.is_file() {
+        return Some(source_path);
+    }
+    None
+}
+
 /// Any executable script
 /// can be added to be executed, but
 /// It's possible to add metadata
@@ -39,7 +85,7 @@ impl Script {
     pub fn load_from_buffer(path: String, body: Box<dyn Read>) -> Script {
         let mut buffer = BufReader::new(body);
         let mut should_complete = false;
-        let mut should_source = false;
+        let should_source = is_source_file(&path);
         let mut help_string = String::new();
         let mut summary_string = String::new();
         let mut line = String::new();
@@ -64,12 +110,10 @@ impl Script {
                 }
             } else if line.starts_with("# COMPLETE") {
                 should_complete = true;
-            } else if line.starts_with("# SOURCE") {
-                should_source = true;
             } else if line.starts_with("# START HELP") {
                 consuming_help = true;
             } else if line.starts_with("# SUMMARY: ") {
-                // 9 = prefix, -1 strips newline
+                // 11 = prefix, -1 strips newline
                 summary_string.push_str(&line[11..(line.len() - 1)]);
             } else if !line.starts_with("#!") {
                 // if a shebang is encountered, we skip.

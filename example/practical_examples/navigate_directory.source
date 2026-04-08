@@ -1,4 +1,3 @@
-# SOURCE
 # SUMMARY: navigate to a directory within the ~/sandbox directory
 root=$HOME/sandbox
 if [ ! -d $root ]; then

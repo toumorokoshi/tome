@@ -1,12 +1,54 @@
 # Basic Scripts
 
-Any standard script executable by your shell is supported as is: just put it into the directory hierarchy and you're ready to go.
+> **Note:** This document pertains to tome 0.11. Historically, tome has not
+> required the executable bit — any file in the scripts directory was
+> recognized as a command. Starting with tome 0.12, only files with the
+> executable bit set are recognized. If you are migrating from an earlier
+> version, ensure your scripts are marked executable (`chmod +x <script>`).
+> Additionally, the `# SOURCE` comment header for marking sourceable scripts
+> has been replaced by the `.source` file suffix (see below).
+
+Any executable script can be added to a tome directory. Only files with the
+executable bit set (e.g. `chmod +x my-script`) will be recognized as commands.
 
 Scripts must not be named with a leading dash! This namespace is reserved for tome commands (e.g. --help).
 
-# Writing Advanced Scripts
+## Non-Executable Files
 
-Any standard script executable by your shell is supported as is: just put it into the directory hierarchy and you're ready to go.
+Files without the executable bit are ignored by tome. This means you can
+safely include READMEs, data files, or library scripts in your tome directory
+without them appearing in help output or tab completion.
+
+## Sourceable Scripts (.source suffix)
+
+If you want to write a script that modifies your current shell (e.g. navigate
+to a directory or set environment variables), name the file with a `.source`
+suffix. For example: `navigate_directory.source`.
+
+Sourceable scripts:
+
+- Do **not** need the executable bit set.
+- Are invoked by their name **without** the `.source` suffix (e.g. `my-command navigate_directory`).
+- Are sourced (`. script`) rather than executed in a subprocess.
+
+Example:
+
+```bash
+# my-env.source
+# SUMMARY: set up my development environment
+export EDITOR=vim
+export DEV_ENVIRONMENT="production"
+cd ~/workspace
+```
+
+You can see an example [in the examples folder](https://github.com/toumorokoshi/tome/blob/master/example/source_example.source) for more details.
+
+Sourcing a script is useful when you want to modify the state of your current shell, including:
+
+- setting environment variables.
+- navigate to a different directory.
+
+# Writing Advanced Scripts
 
 This page covers some more advanced scenarios.
 
@@ -33,20 +75,12 @@ Completion should return options for the last argument. More complex completion 
 
 You can see an example [in the examples folder](https://github.com/toumorokoshi/tome/blob/master/example/file_example) for more details.
 
-## SOURCE vs executed.
+## Ignoring Scripts
 
-If you want to write a script that modifies your current shell (e.g. navigate to a directory or set environment variables), you can author a script with "# SOURCE" as the first line. In this situation, if the script is invoked, the contents will be sourced instead of executed in a subprocess.
+The following files are automatically ignored by tome:
 
-You can see an example [in the examples folder](https://github.com/toumorokoshi/tome/blob/master/example/source_example) for more details.
-
-Source a script helps when you want to modify the state of your current shell, including:
-
-- setting environment variables.
-- navigate to a different directory.
-
-## Ignoring scripts
-
-Files that lead with a `.` are ignored.
+- Files that start with a `.` (dot-prefix)
+- Files without the executable bit set (unless they have a `.source` suffix)
 
 ## Adding help text
 
@@ -72,7 +106,7 @@ A summary can also be added, which will be printed out when you run `commands`:
 ## Locating files relative to the scripts directory
 
 A `_TOME_SCRIPTS_ROOT` environment variable, which points to the root directory
-of the scripts,  is provided to help find files that are stored inside (e.g.
+of the scripts, is provided to help find files that are stored inside (e.g.
 depenendencies of other scripts).
 
 This variable can be used safely in your scripts.

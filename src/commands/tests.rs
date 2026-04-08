@@ -1,24 +1,20 @@
 use super::super::script;
 use std::io::{Cursor, Read};
-/// if a script has "SOURCE"
-/// at the top, it should be sourced in.
+
 #[test]
-fn test_should_source() {
+fn test_source_suffix_sets_should_source() {
     let script = script::Script::load_from_buffer(
-        String::from("./example/foo"),
+        String::from("./example/foo.source"),
         Box::new(Cursor::new(
-            "# SOURCE
-cd /tmp/
+            "cd /tmp/
     ",
         )) as Box<dyn Read>,
     );
     assert_eq!(script.should_source, true);
 }
 
-/// if a script does not have "SOURCE"
-/// at the top, it should be sourced in.
 #[test]
-fn test_should_not_source() {
+fn test_no_source_suffix_not_sourced() {
     let script = script::Script::load_from_buffer(
         String::from("./example/foo"),
         Box::new(Cursor::new(

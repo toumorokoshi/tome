@@ -1,5 +1,3 @@
-# SOURCE
-# COMPLETE
 # SUMMARY: an example for sourcing variables
 # START HELP
 # This is an example of a script that is sourced, rather
@@ -8,13 +6,9 @@
 # effectively, you have similar behavior you would have with
 # a shell function.
 # END HELP
-if [ "$1" = "--complete" ]; then
-    echo "foo baz"
-    exit
-fi
 # you can set environment variables and it'll
 # affect the outer shell.
-EDITOR=vim
-DEV_ENVIRONMENT="production"
+set EDITOR "vim"
+set DEV_ENVIRONMENT "production"
 # or navigate to other directories.
 cd /tmp

@@ -14,9 +14,8 @@ pub fn scan_directory(
     for entry in paths {
         let path = entry.path();
         let file_name = path.file_name().unwrap_or_default().to_str().unwrap_or_default();
-        previous_commands.push(
-            file_name.to_string(),
-        );
+        let command_name = script::strip_source_suffix(file_name).to_string();
+        previous_commands.push(command_name);
         if path.is_dir() {
             if is_tome_script_directory(&path) {
                 result.extend(scan_directory(
@@ -24,7 +23,7 @@ pub fn scan_directory(
                     previous_commands,
                 )?);
             }
-        } else if script::is_tome_script(file_name) {
+        } else if script::is_tome_script(&path) {
             result.push((
                 previous_commands.join(" "),
                 script::Script::load(path.as_path().to_str().unwrap_or_default())?,
