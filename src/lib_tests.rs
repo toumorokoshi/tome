@@ -132,7 +132,10 @@ fn test_source() {
             "--",
             "source_example",
         ])),
-        Ok(format!("'.' '{}/source_example.source'", EXAMPLE_DIR))
+        Ok(format!(
+            "set --; '.' '{}/source_example.source'",
+            EXAMPLE_DIR
+        ))
     );
 }
 
@@ -244,21 +247,19 @@ fn test_script_in_directory_not_found() {
 /// completing to a directory emits the directory name and some help.
 #[test]
 fn test_script_directory_argument() {
-    assert_eq!(
-        execute(_vec_str(vec![
-            "tome",
-            "command-execute",
-            "-s",
-            "bash",
-            EXAMPLE_DIR,
-            "--",
-            "dir_example",
-        ])),
-        Err(format!(
-            "{}/dir_example is a directory. tab-complete to choose subcommands",
-            EXAMPLE_DIR
-        ))
-    );
+    let result = execute(_vec_str(vec![
+        "tome",
+        "command-execute",
+        "-s",
+        "bash",
+        EXAMPLE_DIR,
+        "--",
+        "dir_example",
+    ]))
+    .unwrap();
+    assert!(result.contains("list of dir_example commands available are:"));
+    assert!(result.contains("foo:"));
+    assert!(result.contains("bar:"));
 }
 
 /// if there is no argument passed in for sourcing, an argument will
@@ -276,7 +277,7 @@ fn test_use_arg() {
             "--",
             "use-arg"
         ])),
-        Ok(format!("'.' '{}/use-arg.source'", EXAMPLE_DIR))
+        Ok(format!("set --; '.' '{}/use-arg.source'", EXAMPLE_DIR))
     );
 }
 
@@ -294,7 +295,7 @@ fn test_dangerous_characters_quoted() {
             "--",
             "use-arg"
         ])),
-        Ok(format!("'.' '{}/use-arg.source'", EXAMPLE_DIR))
+        Ok(format!("set --; '.' '{}/use-arg.source'", EXAMPLE_DIR))
     );
 }
 
@@ -370,10 +371,7 @@ fn test_empty_arg_in_middle_of_path() {
             "",
             "file_example"
         ])),
-        Err(format!(
-            "command  not found in directory {}",
-            EXAMPLE_DIR
-        ))
+        Err(format!("command  not found in directory {}", EXAMPLE_DIR))
     );
 }
 
@@ -391,7 +389,10 @@ fn test_source_arg_count() {
             "--",
             "source_example",
         ])),
-        Ok(format!("'.' '{}/source_example.source'", EXAMPLE_DIR))
+        Ok(format!(
+            "set --; '.' '{}/source_example.source'",
+            EXAMPLE_DIR
+        ))
     );
     // One empty arg
     assert_eq!(
@@ -492,6 +493,10 @@ fn test_help_unknown_command_is_eval_safe() {
         "nonexistent_command",
     ]))
     .unwrap();
-    assert!(result.starts_with("echo '"), "expected echo-wrapped output, got: {}", result);
+    assert!(
+        result.starts_with("echo '"),
+        "expected echo-wrapped output, got: {}",
+        result
+    );
     assert!(result.contains(">&2"));
 }

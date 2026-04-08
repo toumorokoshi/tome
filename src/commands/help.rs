@@ -90,8 +90,8 @@ fn help_all_in_dir(root: &str, dir: &str, list_label: &str) -> Result<String, St
     Ok(format!(
         help_template!(),
         root,
-        commands_with_help.join("\\n"),
         list_label,
+        commands_with_help.join("\\n"),
         builtins_with_help.join("\\n"),
     ))
 }

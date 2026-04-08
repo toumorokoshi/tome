@@ -194,7 +194,16 @@ impl Script {
                     arg.push('\'');
                     escaped_command_string.push(arg);
                 }
-                Ok(escaped_command_string.join(" "))
+                let mut final_command = escaped_command_string.join(" ");
+                // handle edge case where a source with zero arguments
+                // should not pass in the script directory.
+                if self.should_source
+                    && args.is_empty()
+                    && (shell.ends_with("bash") || shell.ends_with("zsh"))
+                {
+                    final_command = format!("set --; {}", final_command);
+                }
+                Ok(final_command)
             }
         }
     }

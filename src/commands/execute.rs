@@ -24,10 +24,7 @@ pub fn execute(
                 Err(error) => Err(format!("IOError loading file: {:?}", error)),
             }
         }
-        Ok(FindResult::Directory(path)) => Err(format!(
-            "{} is a directory. tab-complete to choose subcommands",
-            path.to_str().unwrap_or("")
-        )),
+        Ok(FindResult::Directory(_path)) => help::help(command_directory_path, args),
         Err(err) => Err(err),
     }
 }
