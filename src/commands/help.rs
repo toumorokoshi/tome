@@ -73,8 +73,9 @@ fn help_all_in_dir(root: &str, dir: &str, list_label: &str) -> Result<String, St
         })
         .collect();
 
+    let ignorer = super::super::directory::TomeIgnorer::new(std::path::Path::new(root));
     let commands_and_scripts =
-        scan_directory(dir, &mut vec![]).map_err(|e| echo_error(&format!("{}", e)))?;
+        scan_directory(dir, &mut vec![], &ignorer).map_err(|e| echo_error(&format!("{}", e)))?;
     let commands_with_help: Vec<_> = commands_and_scripts
         .iter()
         .map(|(command, script)| {

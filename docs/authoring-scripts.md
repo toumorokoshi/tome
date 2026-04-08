@@ -81,6 +81,17 @@ The following files are automatically ignored by tome:
 
 - Files that start with a `.` (dot-prefix)
 - Files without the executable bit set (unless they have a `.source` suffix)
+- Files or directories matched by a `.tomeignore` file
+
+### Using `.tomeignore`
+
+Tome natively supports a `.tomeignore` file in your root scripts directory. This file uses standard `.gitignore` syntax to specify files and directories that should be excluded from command discovery and completions.
+
+**Backwards Compatibility / Legacy Behavior:**
+If an empty `.tomeignore` file is placed inside a directory, tome will completely ignore that directory, serving as a simple exclusion marker.
+
+**Performance Note:** 
+While `.tomeignore` adds powerful filtering rules, it can add slight parsing overhead during command execution and discovery. It is generally recommended to use the non-executable file approach or dot-prefixed (`.name`) directories when you only need simple exclusion to maximize performance.
 
 ## Adding help text
 

@@ -35,6 +35,7 @@ pub fn complete(
     let remaining_args: Vec<_> = args_peekable.collect();
     return match is_file {
         false => {
+            let ignorer = directory::TomeIgnorer::new(std::path::Path::new(command_directory_path));
             let paths_raw: io::Result<_> = fs::read_dir(target.to_str().unwrap());
             let mut paths: Vec<_> = match paths_raw {
                 Err(_a) => return Err("Invalid argument to completion".to_string()),
@@ -43,7 +44,7 @@ pub fn complete(
             .filter_map(|r| match r {
                 Ok(path_buf) => {
                     let path = path_buf.path();
-                    if path.is_dir() && !directory::is_tome_script_directory(&path) {
+                    if ignorer.is_ignored(&path) {
                         return None;
                     }
                     if path.is_file() && !script::is_tome_script(&path) {

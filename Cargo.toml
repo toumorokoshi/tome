@@ -7,6 +7,7 @@ license = "MIT"
 
 [dependencies]
 clap = { version = "4.4.7", features = ["derive"] }
+ignore = "0.4.25"
 lazy_static = { version = "1.4.0" }
 
 [dev-dependencies]
