@@ -76,4 +76,5 @@ jobs:
         with:
           executable-name: tome
           target: ${{ matrix.platform.target }}
+          changes-file: ""
         if: (startsWith(github.ref, 'refs/tags/') || github.event_name == 'release') && matrix.toolchain == 'stable'
