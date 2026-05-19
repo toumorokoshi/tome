@@ -6,6 +6,11 @@ on:
     tags: ["*"]
   pull_request:
     branches: ["main"]
+  release:
+    types: [published]
+
+permissions:
+  contents: write
 
 env:
   BIN_NAME: "tome"
@@ -66,3 +71,9 @@ jobs:
           toolchain: ${{ matrix.toolchain }}
           args: "--locked --release"
         if: ${{ !matrix.platform.skip_tests }}
+      - name: Publish artifacts and release
+        uses: houseabsolute/actions-rust-release@v0
+        with:
+          executable-name: tome
+          target: ${{ matrix.platform.target }}
+        if: (startsWith(github.ref, 'refs/tags/') || github.event_name == 'release') && matrix.toolchain == 'stable'
