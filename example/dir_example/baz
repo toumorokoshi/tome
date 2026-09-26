@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 # COMPLETE
-# showing a case of returnin deeper completes
+# showing a case of returning deeper completes
 if [[ "$1" == "--complete" ]]; then
-    echo "--bar1 --bar2 --not-bar"
+    shift
+    if [[ $# -gt 0 ]]; then
+        echo "completed with: $*"
+    else
+        echo "--bar1 --bar2 --not-bar"
+    fi
     exit
 fi
 echo "COMMAND: baz $*"
