@@ -54,26 +54,62 @@ This page covers some more advanced scenarios.
 
 ## Tab Completion by Script
 
-Tab completion for a script can improve the usability significantly. Tab completion can be turned on for a script by including a comment with the string "COMPLETE" in the top of the script:
+Tab completion for a script can improve the usability significantly. Tab completion can be enabled for a script by including a comment with the string "COMPLETE" in the header of the script:
 
-```
-#!/usr/bin/env python
+```bash
+#!/usr/bin/env bash
 # COMPLETE
 ```
 
-When tab-completion is requested for a specific script, the script is invoked with the "--complete" argument passed at the end.
+When tab-completion is requested for a specific script, the script is invoked with the `--complete` argument passed as the **first** argument, followed by any arguments already typed.
 
-For example, in the example, tab-completing the following:
+For example, tab-completing the following:
 
-    cb dir_example foo s
+    cb dir_example baz s
 
 Will result in the following being executed:
 
-    ./examples/dir_example/foo s --complete
+    ./example/dir_example/baz --complete s
 
-Completion should return options for the last argument. More complex completion semantics, such as those offered by zsh, are not current available.
+Passing `--complete` as the first argument allows scripts to easily detect completion mode (e.g. checking if `$1` is `--complete`), shift it off, and then inspect the remaining arguments using standard tools like `getopts` or positional arguments.
 
-You can see an example [in the examples folder](https://github.com/toumorokoshi/tome/blob/master/example/file_example) for more details.
+Here is an example in bash:
+
+```bash
+#!/usr/bin/env bash
+# COMPLETE
+
+if [[ "$1" == "--complete" ]]; then
+    shift
+    # "$@" contains any arguments typed after the command
+    # Return completion options (separated by whitespace or newlines)
+    echo "--option1 --option2"
+    exit 0
+fi
+
+# Normal script execution continues below
+```
+
+Here is an example in python:
+
+```python
+#!/usr/bin/env python3
+# COMPLETE
+import sys
+
+if len(sys.argv) > 1 and sys.argv[1] == "--complete":
+    # sys.argv[2:] contains any arguments typed after the command
+    print("option1\noption2")
+    sys.exit(0)
+
+# Normal script execution continues below
+```
+
+Completion should return options for the argument being completed (separated by whitespace or newlines). More complex completion semantics, such as those offered by zsh, are not currently available.
+
+You can see examples in the [example directory](https://github.com/toumorokoshi/tome/blob/main/example/):
+- [example/dir_example/baz](https://github.com/toumorokoshi/tome/blob/main/example/dir_example/baz)
+- [example/file_example](https://github.com/toumorokoshi/tome/blob/main/example/file_example)
 
 ## Ignoring Scripts
 

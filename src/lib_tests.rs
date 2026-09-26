@@ -98,6 +98,42 @@ fn test_simple_script_completion() {
     );
 }
 
+#[test]
+fn test_script_completion_no_args() {
+    assert_eq!(
+        execute(_vec_str(vec![
+            "tome",
+            "command-complete",
+            "-s",
+            SHELL,
+            EXAMPLE_DIR,
+            "--",
+            "dir_example",
+            "baz",
+        ])),
+        Ok(String::from("--bar1 --bar2 --not-bar\n"))
+    );
+}
+
+#[test]
+fn test_script_completion_with_args() {
+    assert_eq!(
+        execute(_vec_str(vec![
+            "tome",
+            "command-complete",
+            "-s",
+            SHELL,
+            EXAMPLE_DIR,
+            "--",
+            "dir_example",
+            "baz",
+            "foo",
+            "bar",
+        ])),
+        Ok(String::from("completed with: foo bar\n"))
+    );
+}
+
 /// Unless the file has the completion annotation
 /// do not invoke completion on it and return nothing
 /// instead.

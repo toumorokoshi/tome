@@ -7,10 +7,12 @@
 #import sys
 
 # when attempting to complete a variable,
-# --complete will be passed, with the full argument set.
-# for example,
-# $ cb file_example foo a --complete
-# will pass all arguments (the "a" should be autocompleted.)
+# --complete will be passed as the first argument, followed by the rest of the arguments.
+# for example, tab completing:
+# $ cb file_example foo a
+# will invoke:
+# $ ./example/file_example --complete foo a
+# (the "a" should be autocompleted.)
 if [ "${1}" == "--complete" ]; then
     echo -n "file autocomplete example"
 else
