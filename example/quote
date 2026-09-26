@@ -1,0 +1,2 @@
+#!/bin/bash
+echo "You said: ($1) $2"
