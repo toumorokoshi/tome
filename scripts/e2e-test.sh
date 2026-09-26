@@ -60,6 +60,14 @@ if e help | grep -E '^ \.foo'; then
     (( test_failures += 1 ))
 fi
 
+# test test-examples bootstrap script
+GOT=$(./scripts/test-examples dir_example bar)
+WANT="bar"
+if [ "${GOT}" != "${WANT}" ]; then
+    echo "test-examples failed; Got '${GOT}', want '${WANT}'"
+    (( test_failures += 1 ))
+fi
+
 if (( test_failures > 0 )); then
     echo "Encountered ${test_failures} test failure(s)"
     exit 1
