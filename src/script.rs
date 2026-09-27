@@ -10,6 +10,8 @@ use std::{
 use super::types::CommandType;
 
 const SOURCE_EXTENSION: &str = "source";
+const SOURCED_SCRIPT_PREFIX: &str = ".";
+const SINGLE_QUOTE_ESCAPE_SEQUENCE: &str = r"'\''";
 
 // used to determine if the file is a valid script or not
 pub fn is_tome_script(path: &Path) -> bool {
@@ -170,30 +172,17 @@ impl Script {
                 }
             }
             CommandType::Execute => {
-                let command_string = if self.should_source {
-                    // when sourcing, just return the full body.
-                    let mut command = vec![String::from("."), self.path.clone()];
-                    for arg in args.iter() {
-                        command.push((**arg).clone());
-                    }
-                    command
+                let prefix: &[&str] = if self.should_source {
+                    &[SOURCED_SCRIPT_PREFIX, &self.path]
                 } else {
-                    let mut command = vec![self.path.clone()];
-                    for arg in args.iter() {
-                        command.push((**arg).clone());
-                    }
-                    command
+                    &[&self.path]
                 };
-                // after figuring out the command, all resolved values
-                // should be quoted, to ensure that the shell does not
-                // interpret character sequences.
-                let mut escaped_command_string = vec![];
-                for mut arg in command_string {
-                    arg = arg.replace('\'', "\\'");
-                    arg.insert(0, '\'');
-                    arg.push('\'');
-                    escaped_command_string.push(arg);
-                }
+                let escaped_command_string: Vec<String> = prefix
+                    .iter()
+                    .copied()
+                    .chain(args.iter().map(|arg| arg.as_str()))
+                    .map(quote_for_shell)
+                    .collect();
                 let mut final_command = escaped_command_string.join(" ");
                 // handle edge case where a source with zero arguments
                 // should not pass in the script directory.
@@ -206,5 +195,96 @@ impl Script {
                 Ok(final_command)
             }
         }
+    }
+}
+
+pub fn quote_for_shell(arg: &str) -> String {
+    format!("'{}'", arg.replace('\'', SINGLE_QUOTE_ESCAPE_SEQUENCE))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_quote_for_shell_plain() {
+        assert_eq!(quote_for_shell("hello"), "'hello'");
+    }
+
+    #[test]
+    fn test_quote_for_shell_with_single_quote() {
+        assert_eq!(
+            quote_for_shell("I'm the developer"),
+            r"'I'\''m the developer'"
+        );
+    }
+
+    #[test]
+    fn test_quote_for_shell_with_surrounding_single_quotes() {
+        assert_eq!(quote_for_shell("'hello'"), r"''\''hello'\'''");
+    }
+
+    #[test]
+    fn test_quote_for_shell_isolated_single_quote() {
+        assert_eq!(quote_for_shell("'"), r"''\'''");
+    }
+
+    #[test]
+    fn test_quote_for_shell_with_double_quotes() {
+        assert_eq!(quote_for_shell("\"hello\""), "'\"hello\"'");
+    }
+
+    #[test]
+    fn test_quote_for_shell_empty() {
+        assert_eq!(quote_for_shell(""), "''");
+    }
+
+    #[test]
+    fn test_quote_for_shell_special_characters() {
+        assert_eq!(
+            quote_for_shell("$PATH `rm -rf` \\ \""),
+            "'$PATH `rm -rf` \\ \"'"
+        );
+    }
+
+    #[test]
+    fn test_get_execution_body_escapes_single_quotes() {
+        let script = Script {
+            help_string: String::new(),
+            path: String::from("/path/to/quotes"),
+            should_complete: false,
+            should_source: false,
+            summary_string: String::new(),
+        };
+        let arg1 = String::from("13");
+        let arg2 = String::from("I'm the developer");
+        let arg3 = String::from("'hello'");
+        let result =
+            script.get_execution_body(CommandType::Execute, "bash", &[&arg1, &arg2, &arg3]);
+        assert_eq!(
+            result,
+            Ok(String::from(
+                r#"'/path/to/quotes' '13' 'I'\''m the developer' ''\''hello'\'''"#
+            ))
+        );
+    }
+
+    #[test]
+    fn test_get_execution_body_sourced_escapes_single_quotes() {
+        let script = Script {
+            help_string: String::new(),
+            path: String::from("/path/to/quotes.source"),
+            should_complete: false,
+            should_source: true,
+            summary_string: String::new(),
+        };
+        let arg1 = String::from("I'm the developer");
+        let result = script.get_execution_body(CommandType::Execute, "bash", &[&arg1]);
+        assert_eq!(
+            result,
+            Ok(String::from(
+                r#"'.' '/path/to/quotes.source' 'I'\''m the developer'"#
+            ))
+        );
     }
 }

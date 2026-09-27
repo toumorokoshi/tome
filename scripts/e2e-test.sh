@@ -68,6 +68,14 @@ if [ "${GOT}" != "${WANT}" ]; then
     (( test_failures += 1 ))
 fi
 
+# test single quote handling
+GOT=$(e quote 13 "I'm the developer")
+WANT="You said: (13) I'm the developer"
+if [ "${GOT}" != "${WANT}" ]; then
+    echo "single quote test failed; Got '${GOT}', want '${WANT}'"
+    (( test_failures += 1 ))
+fi
+
 if (( test_failures > 0 )); then
     echo "Encountered ${test_failures} test failure(s)"
     exit 1

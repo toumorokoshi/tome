@@ -216,7 +216,7 @@ fn test_root_directory_completion() {
     assert_eq!(
         execute(_vec_str(vec!["tome", "command-complete", "-s", "bash", EXAMPLE_DIR])),
         // note that we also complete with builtins
-        Ok("commands dir_example exec file_example help practical_examples read-from-root source_example source_example_fish test_files tome use-arg".to_string())
+        Ok("commands dir_example exec file_example help practical_examples quote read-from-root source_example source_example_fish test_files tome use-arg".to_string())
     );
 }
 
@@ -332,6 +332,27 @@ fn test_dangerous_characters_quoted() {
             "use-arg"
         ])),
         Ok(format!("set --; '.' '{}/use-arg.source'", EXAMPLE_DIR))
+    );
+}
+
+#[test]
+fn test_execute_with_single_quotes() {
+    assert_eq!(
+        execute(_vec_str(vec![
+            "tome",
+            "command-execute",
+            "-s",
+            SHELL,
+            EXAMPLE_DIR,
+            "--",
+            "file_example",
+            "I'm the developer",
+            "'hello'",
+        ])),
+        Ok(format!(
+            "'{}/file_example' 'I'\\''m the developer' ''\\''hello'\\'''",
+            EXAMPLE_DIR
+        ))
     );
 }
 
