@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.4](https://github.com/toumorokoshi/tome/compare/v0.12.3...v0.12.4) - 2026-09-28
+
+### Other
+
+- publish binary artifacts to GitHub Release after release-plz
+
 ## [0.12.3](https://github.com/toumorokoshi/tome/compare/v0.12.2...v0.12.3) - 2026-09-28
 
 ### Fixed
