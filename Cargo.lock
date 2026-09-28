@@ -328,7 +328,7 @@ dependencies = [
 
 [[package]]
 name = "tome-scripts"
-version = "0.12.3"
+version = "0.12.4"
 dependencies = [
  "clap",
  "ignore",

@@ -1,6 +1,6 @@
 [package]
 name = "tome-scripts"
-version = "0.12.3"
+version = "0.12.4"
 authors = ["Yusuke Tsutsumi <yusuke@tsutsumi.io>"]
 edition = "2018"
 license = "MIT"
