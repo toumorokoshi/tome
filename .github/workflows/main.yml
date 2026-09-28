@@ -1,6 +1,6 @@
 name: Build and Release
 on:
-  # # Indicates I want to run this workflow on all branches, PR, and tags
+  # Indicates I want to run this workflow on all branches, PR, and tags
   push:
     branches: ["*"]
     tags: ["*"]
@@ -8,6 +8,16 @@ on:
     branches: ["main"]
   release:
     types: [published]
+  workflow_run:
+    workflows: ["Release-plz"]
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to publish assets for"
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -17,8 +27,55 @@ env:
   CRATE_NAME: tome
 
 jobs:
+  check:
+    name: Check release
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+      release_tag: ${{ steps.check.outputs.release_tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
+          fetch-depth: 0
+      - id: check
+        run: |
+          SHOULD_RUN="true"
+          RELEASE_TAG=""
+
+          if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+            if [[ "${{ github.event.workflow_run.conclusion }}" != "success" ]]; then
+              echo "Upstream workflow failed. Skipping."
+              SHOULD_RUN="false"
+            else
+              # In workflow_run, only run if a release tag was created on the head commit
+              RELEASE_TAG=$(git tag --points-at HEAD | grep '^v[0-9]' | head -n1 || true)
+              if [[ -z "$RELEASE_TAG" ]]; then
+                echo "No release tag found on HEAD. Skipping."
+                SHOULD_RUN="false"
+              else
+                echo "Found release tag on HEAD: $RELEASE_TAG"
+              fi
+            fi
+          elif [[ "${{ github.event_name }}" == "release" ]]; then
+            RELEASE_TAG="${{ github.event.release.tag_name }}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            RELEASE_TAG="${{ github.ref_name }}"
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            RELEASE_TAG="${{ inputs.tag }}"
+            if [[ -z "$RELEASE_TAG" ]]; then
+              RELEASE_TAG=$(git tag --points-at HEAD | grep '^v[0-9]' | head -n1 || true)
+            fi
+          fi
+
+          echo "should_run=$SHOULD_RUN" >> "$GITHUB_OUTPUT"
+          echo "release_tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+          echo "Decision: should_run=$SHOULD_RUN, release_tag=$RELEASE_TAG"
+
   build:
     name: ${{ matrix.platform.os_name }} with rust ${{ matrix.toolchain }}
+    needs: check
+    if: needs.check.outputs.should_run == 'true'
     runs-on: ${{ matrix.platform.os }}
     strategy:
       fail-fast: false
@@ -51,7 +108,9 @@ jobs:
           - stable
           - beta
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
       - name: Install musl-tools on Linux
         run: sudo apt-get update --yes && sudo apt-get install --yes musl-tools
         if: contains(matrix.platform.target, 'musl')
@@ -71,10 +130,19 @@ jobs:
           toolchain: ${{ matrix.toolchain }}
           args: "--locked --release"
         if: ${{ !matrix.platform.skip_tests }}
-      - name: Publish artifacts and release
+      - name: Package artifacts
         uses: houseabsolute/actions-rust-release@v0
         with:
           executable-name: tome
           target: ${{ matrix.platform.target }}
           changes-file: ""
-        if: (startsWith(github.ref, 'refs/tags/') || github.event_name == 'release') && matrix.toolchain == 'stable'
+        if: needs.check.outputs.release_tag != '' && matrix.toolchain == 'stable'
+      - name: Upload artifacts to GitHub Release
+        if: needs.check.outputs.release_tag != '' && matrix.toolchain == 'stable'
+        run: |
+          gh release upload "${{ needs.check.outputs.release_tag }}" \
+            tome-*.tar.gz \
+            tome-*.tar.gz.sha256 \
+            --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
