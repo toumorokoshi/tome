@@ -1,5 +1,5 @@
 [package]
-name = "tome"
+name = "tome-scripts"
 version = "0.12.2"
 authors = ["Yusuke Tsutsumi <yusuke@tsutsumi.io>"]
 edition = "2018"
@@ -7,6 +7,14 @@ license = "MIT"
 description = "Turn directories of shell scripts into full-blown CLIs"
 readme = "README.md"
 repository = "https://github.com/toumorokoshi/tome"
+
+[lib]
+name = "tome"
+path = "src/lib.rs"
+
+[[bin]]
+name = "tome"
+path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4.4.7", features = ["derive"] }
