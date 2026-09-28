@@ -8,6 +8,8 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  # Required for crates.io Trusted Publishing (OIDC)
+  id-token: write
 
 jobs:
   release-plz:

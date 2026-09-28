@@ -4,6 +4,9 @@ version = "0.12.2"
 authors = ["Yusuke Tsutsumi <yusuke@tsutsumi.io>"]
 edition = "2018"
 license = "MIT"
+description = "Turn directories of shell scripts into full-blown CLIs"
+readme = "README.md"
+repository = "https://github.com/toumorokoshi/tome"
 
 [dependencies]
 clap = { version = "4.4.7", features = ["derive"] }

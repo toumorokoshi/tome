@@ -1,6 +1,6 @@
 [workspace]
-# tome is distributed via GitHub Releases and not published to crates.io
-publish = false
+# Enable publishing to crates.io
+publish = true
 # Disable public API breaking change checks against crates.io
 semver_check = false
 # Enable automatic creation of GitHub releases with changelog notes
